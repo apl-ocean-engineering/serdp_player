@@ -1,18 +1,19 @@
-#include <SonarPlayer.h>
+#include "GPMF_player.h"
 
-int SonarPlayer::playbackSonarFile(const std::string &filename,
-                                   std::ofstream &output, int stopAfter) {
+std::shared_ptr<SonarData>
+GPMF_player::playbackGPMF(const std::string &filename, std::ofstream &output,
+                          int stopAfter) {
   std::shared_ptr<liboculus::SonarPlayerBase> player(
       liboculus::SonarPlayerBase::OpenFile(filename));
 
   if (!player) {
     LOG(WARNING) << "Unable to open sonar file";
-    return -1;
+    return nullptr;
   }
 
   if (!player->open(filename)) {
     LOG(INFO) << "Failed to open " << filename;
-    return -1;
+    return nullptr;
   }
 
   int count = 0;
@@ -35,5 +36,5 @@ int SonarPlayer::playbackSonarFile(const std::string &filename,
 
   LOG(INFO) << count << " sonar packets decoded";
 
-  return 0;
+  return nullptr;
 }

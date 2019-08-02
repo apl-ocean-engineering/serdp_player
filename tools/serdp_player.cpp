@@ -1,4 +1,4 @@
-#include <SonarPlayer.h>
+#include "GPMF_player.h"
 
 int main(int argc, char **argv) {
 
@@ -45,10 +45,10 @@ int main(int argc, char **argv) {
     }
   }
 
-  SonarPlayer sonarPlayer;
+  GPMF_player GPMF_player;
 
   if (!inputFilename.empty()) {
-    sonarPlayer.playbackSonarFile(inputFilename, output, stopAfter);
+    GPMF_player.playbackGPMF(inputFilename, output, stopAfter);
   }
 
   return 0;
