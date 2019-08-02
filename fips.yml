@@ -1,0 +1,14 @@
+#
+# serdp_player
+#
+---
+
+# external dependencies
+imports:
+    serdp-common:
+        git: https://github.com/apl-ocean-engineering/serdp_common.git
+
+defines:
+  FIPS_EXCEPTIONS: ON
+  FIPS_RTTI: ON
+  FIPS_UNITTESTS_RUN_AFTER_BUILD: ON
