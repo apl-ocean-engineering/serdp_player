@@ -3,6 +3,8 @@
 #include <string>
 #include <thread>
 
+#include <vector>;
+
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
@@ -15,13 +17,10 @@
 #include "liboculus/StatusRx.h"
 
 class SonarData {
-  float frequency;
-  float bearings;
-  float ranges;
-  float intensities;
-
-  int _numBearings;
-  int _numRanges;
+  std::vector<float> frequency;
+  std::vector<float> bearings;
+  std::vector<float> ranges;
+  std::vector<float> intensities;
 
 public:
   SonarData(int nBearings, int nRanges);

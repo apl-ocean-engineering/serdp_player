@@ -18,6 +18,7 @@ GPMF_player::playbackGPMF(const std::string &filename, std::ofstream &output,
 
   int count = 0;
   std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
+  std::shared_ptr<SonarData> sonarData;
   while (ping && !player->eof()) {
 
     ping->valid();
