@@ -1,5 +1,9 @@
-#include "serdp_common/DrawSonar.h"
+#include "mov_decoder.h"
+#include "serdp_common/OpenCVDisplay.h"
 #include "serdp_common/PingDecoder.h"
+
+//#include <opencv2/core/core.hpp>
+//#include <opencv2/highgui/highgui.hpp>
 
 int main(int argc, char **argv) {
 
@@ -65,12 +69,11 @@ int main(int argc, char **argv) {
     while (ping && !player->eof()) {
       if (ping->valid()) {
         serdp_common::PingDecoder pingDecoder;
-        std::shared_ptr<serdp_common::PingDecoder::SonarData> sonarData =
+        serdp_common::PingDecoder::SonarData sonarData =
             pingDecoder.pingPlayback(ping);
 
-        cv::Mat mat;
-
-        serdp_common::drawSonar(ping, mat);
+        std::shared_ptr<serdp_common::OpenCVDisplay> display;
+        display->showSonar(ping);
       }
 
       count++;
