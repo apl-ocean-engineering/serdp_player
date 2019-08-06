@@ -8,11 +8,8 @@ include("${FIPS_ROOT_DIR}/cmake/fips.cmake")
 
 fips_setup(PROJECT serdp_player)
 
-
-fips_include_directories(
-  ${CMAKE_SOURCE_DIR}/include
-  #${OpenCV_INCLUDE_DIRS}
- )
+list(APPEND OPENCV_COMPONENTS core highgui imgproc )
+find_package(OpenCV COMPONENTS ${OPENCV_COMPONENTS} REQUIRED)
 
 
 
@@ -20,10 +17,11 @@ fips_begin_module( serdpplayer )
 
   fips_src( lib *.cpp )
 
-  fips_deps( gpmf g3log g3logger oculus)
+  fips_deps( gpmf g3log g3logger oculus serdp_common)
 
   fips_include_directories(
     ${CMAKE_SOURCE_DIR}/include
+    ${OpenCV_INCLUDE_DIRS}
    )
 
 

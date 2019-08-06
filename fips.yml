@@ -7,6 +7,7 @@
 imports:
     serdp-common:
         git: https://github.com/apl-ocean-engineering/serdp_common.git
+        branch: mitchell_dev
 
 defines:
   FIPS_EXCEPTIONS: ON

@@ -1,4 +1,5 @@
-#include "GPMF_player.h"
+#include "serdp_common/DrawSonar.h"
+#include "serdp_common/PingDecoder.h"
 
 int main(int argc, char **argv) {
 
@@ -45,10 +46,39 @@ int main(int argc, char **argv) {
     }
   }
 
-  GPMF_player GPMF_player;
-
   if (!inputFilename.empty()) {
-    GPMF_player.playbackGPMF(inputFilename, output, stopAfter);
+    std::shared_ptr<liboculus::SonarPlayerBase> player(
+        liboculus::SonarPlayerBase::OpenFile(inputFilename));
+
+    if (!player) {
+      LOG(WARNING) << "Unable to open sonar file";
+      return 0;
+    }
+
+    if (!player->open(inputFilename)) {
+      LOG(INFO) << "Failed to open " << inputFilename;
+      return 0;
+    }
+
+    int count = 0;
+    std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
+    while (ping && !player->eof()) {
+      if (ping->valid()) {
+        serdp_common::PingDecoder pingDecoder;
+        std::shared_ptr<serdp_common::PingDecoder::SonarData> sonarData =
+            pingDecoder.pingPlayback(ping);
+
+        cv::Mat mat;
+
+        serdp_common::drawSonar(ping, mat);
+      }
+
+      count++;
+      if ((stopAfter > 0) && (count >= stopAfter))
+        break;
+
+      ping = player->nextPing();
+    }
   }
 
   return 0;
