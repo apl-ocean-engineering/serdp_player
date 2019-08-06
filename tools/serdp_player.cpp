@@ -2,6 +2,8 @@
 #include "serdp_common/OpenCVDisplay.h"
 #include "serdp_common/PingDecoder.h"
 
+#include <opencv2/highgui/highgui.hpp>
+
 //#include <opencv2/core/core.hpp>
 //#include <opencv2/highgui/highgui.hpp>
 
@@ -66,14 +68,15 @@ int main(int argc, char **argv) {
 
     int count = 0;
     std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
+    std::shared_ptr<serdp_common::OpenCVDisplay> display;
     while (ping && !player->eof()) {
       if (ping->valid()) {
         serdp_common::PingDecoder pingDecoder;
         serdp_common::PingDecoder::SonarData sonarData =
             pingDecoder.pingPlayback(ping);
 
-        std::shared_ptr<serdp_common::OpenCVDisplay> display;
-        display->showSonar(ping);
+        display->sonarDisplay(ping);
+        cv::waitKey(1);
       }
 
       count++;
