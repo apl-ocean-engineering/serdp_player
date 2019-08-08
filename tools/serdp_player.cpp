@@ -69,13 +69,32 @@ int main(int argc, char **argv) {
     int count = 0;
     std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
     std::shared_ptr<serdp_common::OpenCVDisplay> display;
+    cv::VideoCapture cap("/home/mitchell/SERDP_WS/serdp_osb_nov_2018/raw_data/"
+                         "11-15-2018/3d2r2/output.mp4");
+
+    float video_time_init = cap.get(cv::CAP_PROP_POS_MSEC);
+    float sonar_time_init;
     while (ping && !player->eof()) {
+      cv::Mat frame;
+      // Capture frame-by-frame
+      cap >> frame;
+      std::cout << "Video timestamp: "
+                << cap.get(cv::CAP_PROP_POS_MSEC) - video_time_init
+                << std::endl;
       if (ping->valid()) {
         serdp_common::PingDecoder pingDecoder;
         serdp_common::PingDecoder::SonarData sonarData =
             pingDecoder.pingPlayback(ping);
+        if (count == 0) {
+          sonar_time_init = sonarData.timestamp / 1000.0;
+        } else {
+          std::cout << "gopro init timestamp: " << sonar_time_init << std::endl;
+          std::cout << "gopro timestamp: " << count << std::endl;
+        }
 
         display->sonarDisplay(ping);
+        cv::imshow("video_img", frame);
+
         cv::waitKey(1);
       }
 

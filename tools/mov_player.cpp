@@ -29,166 +29,300 @@
  * See library 'libavformat' for the format handling
  * @example doc/examples/decoding_encoding.c
  */
+#include "liboculus/SonarPlayer.h"
+#include "serdp_common/OpenCVDisplay.h"
+#include "serdp_common/PingDecoder.h"
+#include <iostream>
+#include <libg3logger/g3logger.h>
+#include <opencv2/highgui/highgui.hpp>
+
 extern "C" {
-#include "libavcodec/avcodec.h"
-#include "libavformat/avformat.h"
-#include "libavutil/error.h"
-#include "libavutil/imgutils.h"
-#include "libavutil/mathematics.h"
-#include "libavutil/samplefmt.h"
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+
+//#include "gpmf-parser/GPMF_parser.h"
+// #include "GPMF_print.cpp"
+#include "gpmf-parser/demo/GPMF_mp4reader.h"
 }
 
-#define INBUF_SIZE 4096
-#define AUDIO_INBUF_SIZE 20480
-#define AUDIO_REFILL_THRESH 4096
+extern void PrintGPMF(GPMF_stream *ms);
 
-static void pgm_save(unsigned char *buf, int wrap, int xsize, int ysize,
-                     char *filename) {
-  FILE *f;
-  int i;
-  f = fopen(filename, "w");
-  fprintf(f, "P5\n%d %d\n%d\n", xsize, ysize, 255);
-  for (i = 0; i < ysize; i++)
-    fwrite(buf + i * wrap, 1, xsize, f);
-  fclose(f);
-}
+// void sonarDisplay(GPMF_stream *ms);
+void singleSonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
+                        std::shared_ptr<liboculus::SonarPlayerBase> player) {
 
-static int decode_write_frame(const char *outfilename, AVCodecContext *avctx,
-                              AVFrame *frame, int *frame_count, AVPacket *pkt,
-                              int last) {
-  int len, got_frame;
-  char buf[1024];
-  len = avcodec_decode_video2(avctx, frame, &got_frame, pkt);
-  if (len < 0) {
-    fprintf(stderr, "Error while decoding frame %d\n", *frame_count);
-    return len;
+  std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
+  // while (ping) {
+  if (ping->valid()) {
+    serdp_common::PingDecoder pingDecoder;
+    serdp_common::PingDecoder::SonarData sonarData =
+        pingDecoder.pingPlayback(ping);
+    display->sonarDisplay(ping);
+    cv::waitKey(1);
   }
-  if (got_frame) {
-    printf("Saving %sframe %3d\n", last ? "last " : "", *frame_count);
-    fflush(stdout);
-    /* the picture is allocated by the decoder, no need to free it */
-    snprintf(buf, sizeof(buf), outfilename, *frame_count);
-    pgm_save(frame->data[0], frame->linesize[0], avctx->width, avctx->height,
-             buf);
-    (*frame_count)++;
-  }
-  if (pkt->data) {
-    pkt->size -= len;
-    pkt->data += len;
-  }
-  return 0;
+  // ping = player->nextPing();
+  //}
 }
 
-static void video_decode_example(const char *outfilename,
-                                 const char *filename) {
-  AVCodec *codec;
-  AVCodecContext *c = NULL;
-  int frame_count;
-  FILE *f;
-  AVFrame *frame;
-  uint8_t inbuf[INBUF_SIZE + FF_INPUT_BUFFER_PADDING_SIZE];
-  AVPacket avpkt;
-  av_init_packet(&avpkt);
-  /* set end of buffer to 0 (this ensures that no overreading happens for
-   * damaged mpeg streams) */
-  memset(inbuf + INBUF_SIZE, 0, FF_INPUT_BUFFER_PADDING_SIZE);
-  printf("Decode video file %s to %s\n", filename, outfilename);
-  /* find the mpeg1 video decoder */
-  codec = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
-  if (!codec) {
-    fprintf(stderr, "Codec not found\n");
-    exit(1);
+int runSonar(char *filename) {
+  int32_t ret = GPMF_OK;
+  GPMF_stream metadata_stream, *ms = &metadata_stream;
+  double metadatalength;
+  uint32_t *payload = NULL; // buffer to store GPMF samples from the MP4.
+
+  size_t mp4 =
+      OpenMP4Source(filename, MOV_GPMF_TRAK_TYPE, MOV_GPMF_TRAK_SUBTYPE);
+  // OpenMP4SourceUDTA(argv[1]);
+  if (mp4 == 0) {
+    printf("error: %s is an invalid MP4/MOV\n", filename);
+    return -1;
   }
-  c = avcodec_alloc_context3(codec);
-  if (!c) {
-    fprintf(stderr, "Could not allocate video codec context\n");
-    exit(1);
+  //
+  metadatalength = GetDuration(mp4);
+
+  if (metadatalength > 0.0) {
+    // if (1) {
+    uint32_t index, payloads = GetNumberPayloads(mp4);
+    // metadatalength, payloads, argv[1]);
+    // std::cout << payloads << std::endl;
+    if (payloads == 1) // Printf the contents of the single payload
+    {
+      uint32_t payloadsize = GetPayloadSize(mp4, 0);
+      payload = GetPayload(mp4, payload, 0);
+      if (payload == NULL)
+        goto cleanup;
+
+      ret = GPMF_Init(ms, payload, payloadsize);
+      if (ret != GPMF_OK)
+        goto cleanup;
+
+      // Output (printf) all the contained GPMF data within this payload
+      ret = GPMF_Validate(ms, GPMF_RECURSE_LEVELS); // optional
+      if (GPMF_OK != ret) {
+
+        goto cleanup;
+      }
+
+      GPMF_ResetState(ms);
+      do {
+
+        PrintGPMF(ms); // printf current GPMF KLV
+      } while (GPMF_OK == GPMF_Next(ms, GPMF_RECURSE_LEVELS));
+      GPMF_ResetState(ms);
+    }
+
+    //
+    for (index = 0; index < payloads; index++) {
+      uint32_t payloadsize = GetPayloadSize(mp4, index);
+      float in = 0.0, out = 0.0; // times
+      payload = GetPayload(mp4, payload, index);
+      if (payload == NULL)
+        goto cleanup;
+
+      ret = GetPayloadTime(mp4, index, &in, &out);
+      if (ret != GPMF_OK)
+        goto cleanup;
+
+      ret = GPMF_Init(ms, payload, payloadsize);
+      if (ret != GPMF_OK)
+        goto cleanup;
+      // Find all the available Streams and the data carrying FourCC
+      // if (index < 1000) // show first payload
+      if (1) {
+        ret = GPMF_FindNext(ms, GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS);
+
+        while (GPMF_OK == ret) {
+          ret = GPMF_SeekToSamples(ms);
+          std::shared_ptr<liboculus::SonarPlayerBase> player(
+              liboculus::SonarPlayerBase::createGPMFSonarPlayer());
+          player->setStream(ms);
+          std::shared_ptr<serdp_common::OpenCVDisplay> display;
+          singleSonarDisplay(display, player);
+          if (GPMF_OK == ret) // find the last FOURCC within the stream
+          {
+            uint32_t key = GPMF_Key(ms);
+            // GPMF_SampleType type = GPMF_Type(ms);
+            uint32_t type = GPMF_Type(ms);
+            uint32_t elements = GPMF_ElementsInStruct(ms);
+            // uint32_t samples = GPMF_Repeat(ms);
+            uint32_t samples = GPMF_PayloadSampleCount(ms);
+
+            if (samples) {
+              // printf("  STRM of %c%c%c%c ", PRINTF_4CC(key));
+
+              if (type == GPMF_TYPE_COMPLEX) {
+                GPMF_stream find_stream;
+                GPMF_CopyState(ms, &find_stream);
+
+                if (GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_TYPE,
+                                             GPMF_CURRENT_LEVEL)) {
+                  char tmp[64];
+                  char *data = (char *)GPMF_RawData(&find_stream);
+                  int size = GPMF_RawDataSize(&find_stream);
+
+                  if (size < sizeof(tmp)) {
+                    memcpy(tmp, data, size);
+                    tmp[size] = 0;
+                    // printf("of type %s ", tmp);
+                  }
+                }
+
+              } else {
+                // printf("of type %c ", type);
+              }
+
+              // printf("with %d sample%s \n", samples, samples > 1 ? "s" : "");
+
+              // if (elements > 1)
+              // printf("-- %d elements per sample", elements);
+            }
+
+            ret = GPMF_FindNext(ms, GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS);
+          } else {
+            if (ret ==
+                GPMF_ERROR_BAD_STRUCTURE) // some payload element was corrupt,
+                                          // skip to the next valid GPMF KLV at
+                                          // the previous level.
+            {
+              ret = GPMF_Next(
+                  ms, GPMF_CURRENT_LEVEL); // this will be the nexstream if
+              // any more are present.
+            }
+          }
+        }
+        GPMF_ResetState(ms);
+      }
+      // Find GPS values and return scaled doubles.
+      if (index == 0) // show first payload
+      {
+        if (GPMF_OK ==
+                GPMF_FindNext(ms, STR2FOURCC("GPS5"),
+                              GPMF_RECURSE_LEVELS) || // GoPro Hero5 / 6 GPS
+            GPMF_OK == GPMF_FindNext(ms, STR2FOURCC("GPRI"),
+                                     GPMF_RECURSE_LEVELS)) // GoPro Karma GPS
+        {
+          uint32_t key = GPMF_Key(ms);
+          uint32_t samples = GPMF_Repeat(ms);
+          uint32_t elements = GPMF_ElementsInStruct(ms);
+          uint32_t buffersize = samples * elements * sizeof(double);
+          GPMF_stream find_stream;
+          double *ptr, *tmpbuffer = (double *)malloc(buffersize);
+          char units[10][6] = {""};
+          uint32_t unit_samples = 1;
+
+          if (tmpbuffer && samples) {
+            uint32_t i, j;
+
+            // Search for any units to display
+            GPMF_CopyState(ms, &find_stream);
+            if (GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_SI_UNITS,
+                                         GPMF_CURRENT_LEVEL) ||
+                GPMF_OK == GPMF_FindPrev(&find_stream, GPMF_KEY_UNITS,
+                                         GPMF_CURRENT_LEVEL)) {
+              char *data = (char *)GPMF_RawData(&find_stream);
+              int ssize = GPMF_StructSize(&find_stream);
+              unit_samples = GPMF_Repeat(&find_stream);
+
+              for (i = 0; i < unit_samples; i++) {
+                memcpy(units[i], data, ssize);
+                units[i][ssize] = 0;
+                data += ssize;
+              }
+            }
+
+            // GPMF_FormattedData(ms, tmpbuffer, buffersize, 0, samples);
+            //
+            // Output data in LittleEnd, but no scale
+            GPMF_ScaledData(ms, tmpbuffer, buffersize, 0, samples,
+                            GPMF_TYPE_DOUBLE); // Output scaled data as floats
+
+            ptr = tmpbuffer;
+            for (i = 0; i < samples; i++) {
+              printf("%c%c%c%c ", PRINTF_4CC(key));
+              for (j = 0; j < elements; j++)
+                printf("%.3f%s, ", *ptr++, units[j % unit_samples]);
+            }
+            free(tmpbuffer);
+          }
+        }
+        GPMF_ResetState(ms);
+      }
+    }
+    // std::cout << GPMF_OK << " " << GPMF_Next(ms, GPMF_RECURSE_LEVELS)
+    //          << std::endl;
+    // Find all the available Streams and compute they sample rates
+    //
+    do {
+      // std::cout << ms << std::endl;
+      PrintGPMF(ms); // printf current GPMF KLV
+    } while (GPMF_OK == GPMF_Next(ms, GPMF_RECURSE_LEVELS));
+    GPMF_ResetState(ms);
+    //
+    while (GPMF_OK == GPMF_FindNext(ms, GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS)) {
+      if (GPMF_OK ==
+          GPMF_SeekToSamples(ms)) // find the last FOURCC within the stream
+
+      {
+        // sonarDisplay(ms);
+        double in = 0.0, out = 0.0;
+        uint32_t fourcc = GPMF_Key(ms);
+        double rate = GetGPMFSampleRate(
+            mp4, fourcc, GPMF_SAMPLE_RATE_PRECISE); // GPMF_SAMPLE_RATE_FAST);
+        // std::cout << "rate " << rate << std::endl;
+      }
+      // else {
+      //   std::cout << "NOT OK" << std::endl;
+      // }
+    }
+
+    // // DO Processing
+    // GPMF_ResetState(ms);
+
+  cleanup:
+    // std::cout << "cleanup" << std::endl;
+    if (payload)
+      FreePayload(payload);
+    payload = NULL;
+    CloseSource(mp4);
   }
-  if (codec->capabilities & CODEC_CAP_TRUNCATED)
-    c->flags |= CODEC_FLAG_TRUNCATED; /* we do not send complete frames */
-  /* For some codecs, such as msmpeg4 and mpeg4, width and height
-     MUST be initialized there because this information is not
-     available in the bitstream. */
-  /* open it */
-  if (avcodec_open2(c, codec, NULL) < 0) {
-    fprintf(stderr, "Could not open codec\n");
-    exit(1);
-  }
-  f = fopen(filename, "rb");
-  if (!f) {
-    fprintf(stderr, "Could not open %s\n", filename);
-    exit(1);
-  }
-  // frame = av_frame_alloc();
-  // if (!frame) {
-  //   fprintf(stderr, "Could not allocate video frame\n");
-  //   exit(1);
-  // }
-  frame_count = 0;
-  for (;;) {
-    avpkt.size = fread(inbuf, 1, INBUF_SIZE, f);
-    if (avpkt.size == 0)
-      break;
-    /* NOTE1: some codecs are stream based (mpegvideo, mpegaudio)
-       and this is the only method to use them because you cannot
-       know the compressed data size before analysing it.
-       BUT some other codecs (msmpeg4, mpeg4) are inherently frame
-       based, so you must call them with all the data for one
-       frame exactly. You must also initialize 'width' and
-       'height' before initializing them. */
-    /* NOTE2: some codecs allow the raw parameters (frame size,
-       sample rate) to be changed at any frame. We handle this, so
-       you should also take care of it */
-    /* here, we use a stream based decoder (mpeg1video), so we
-       feed decoder and see if it could decode a frame */
-    avpkt.data = inbuf;
-    while (avpkt.size > 0)
-      if (decode_write_frame(outfilename, c, frame, &frame_count, &avpkt, 0) <
-          0)
-        exit(1);
-  }
-  /* some codecs, such as MPEG, transmit the I and P frame with a
-     latency of one frame. You must do the following to have a
-     chance to get the last frame of the video */
-  avpkt.data = NULL;
-  avpkt.size = 0;
-  decode_write_frame(outfilename, c, frame, &frame_count, &avpkt, 1);
-  fclose(f);
-  avcodec_close(c);
-  // av_free(c);
-  // av_frame_free(&frame);
-  printf("\n");
 }
-int main(int argc, char **argv) {
-  const char *output_type;
-  /* register all the codecs */
-  // avcodec_register_all();
-  if (argc < 2) {
-    printf(
-        "usage: %s output_type\n"
-        "API example program to decode/encode a media stream with libavcodec.\n"
-        "This program generates a synthetic stream and encodes it to a file\n"
-        "named test.h264, test.mp2 or test.mpg depending on output_type.\n"
-        "The encoded stream is then decoded and written to a raw data output.\n"
-        "output_type must be choosen between 'h264', 'mp2', 'mpg'.\n",
-        argv[0]);
-    return 1;
+
+int main(int argc, char *argv[]) {
+  libg3logger::G3Logger logger("ocClient");
+  // LOG(WARNING) << "start"
+  if (argc != 2) {
+    printf("usage: %s <file_with_GPMF>\n", argv[0]);
+    return -1;
   }
-  output_type = argv[1];
-  if (!strcmp(output_type, "h264")) {
-    // video_encode_example("test.h264", AV_CODEC_ID_H264);
-  } else if (!strcmp(output_type, "mp2")) {
-    // audio_encode_example("test.mp2");
-    // audio_decode_example("test.sw", "test.mp2");
-  } else if (!strcmp(output_type, "mpg")) {
-    // video_encode_example("test.mpg", AV_CODEC_ID_MPEG1VIDEO);
-    video_decode_example("test%02d.pgm", "test.mpg");
-  } else {
-    fprintf(
-        stderr,
-        "Invalid output type '%s', choose between 'h264', 'mp2', or 'mpg'\n",
-        output_type);
-    return 1;
-  }
-  return 0;
+
+  int ret = runSonar(argv[1]);
+
+  return ret;
 }
+
+// void sonarDisplay(GPMF_stream *ms) {
+//   if (ms) {
+//     // std::cout << std::endl << std::endl << "here" << std::endl;
+//     std::shared_ptr<liboculus::SonarPlayerBase> player(
+//         liboculus::SonarPlayerBase::createGPMFSonarPlayer());
+//     player->setStream(ms);
+//
+//     std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
+//     std::shared_ptr<serdp_common::OpenCVDisplay> display;
+//
+//     while (ping) {
+//       if (ping->valid()) {
+//         serdp_common::PingDecoder pingDecoder;
+//         serdp_common::PingDecoder::SonarData sonarData =
+//             pingDecoder.pingPlayback(ping);
+//         display->sonarDisplay(ping);
+//         cv::waitKey(1);
+//       }
+//       ping = player->nextPing();
+//     }
+//   }
+// }

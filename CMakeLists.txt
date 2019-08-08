@@ -8,11 +8,12 @@ include("${FIPS_ROOT_DIR}/cmake/fips.cmake")
 
 fips_setup(PROJECT serdp_player)
 
-list(APPEND OPENCV_COMPONENTS core highgui imgproc )
+list(APPEND OPENCV_COMPONENTS core highgui imgproc videoio)
 find_package(OpenCV COMPONENTS ${OPENCV_COMPONENTS} REQUIRED)
 
 find_path( AVCODEC_INCLUDE_DIR libavcodec/avcodec.h )
 find_library( AVCODEC_LIBRARY avcodec )
+
 
 ## C++ flags applied to all builds
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
