@@ -46,7 +46,7 @@ extern "C" {
 
 //#include "gpmf-parser/GPMF_parser.h"
 // #include "GPMF_print.cpp"
-#include "gpmf-parser/demo/GPMF_mp4reader.h"
+#include "GPMF_mp4reader.h"
 }
 
 extern void PrintGPMF(GPMF_stream *ms);
