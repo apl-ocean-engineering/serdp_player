@@ -20,6 +20,7 @@ MovDecoder::~MovDecoder() {
 }
 
 std::vector<int> MovDecoder::streamCodecParse() {
+  // Find all present codecs
   bool foundVideo(false);
   std::vector<int> vec;
   for (int i = 0; i < pFormatCtx->nb_streams; i++) {
@@ -37,6 +38,7 @@ std::vector<int> MovDecoder::streamCodecParse() {
 }
 
 void MovDecoder::initCodecs() {
+  // Initalize the codecs in the streams
   pCodecCtx = pFormatCtx->streams[videoStream]->codec;
   pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
 
@@ -70,8 +72,9 @@ void MovDecoder::initCodecs() {
 }
 
 cv::Mat
-MovDecoder::sonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
-                         std::shared_ptr<liboculus::SonarPlayerBase> player) {
+MovDecoder::gpmfImg(std::shared_ptr<serdp_common::OpenCVDisplay> display,
+                    std::shared_ptr<liboculus::SonarPlayerBase> player) {
+  // Cast the GPMF format into a cv mat
   cv::Mat img;
   std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
   if (ping->valid()) {
@@ -84,7 +87,8 @@ MovDecoder::sonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
   return img;
 }
 
-cv::Mat MovDecoder::playGPMF(AVPacket packet) {
+cv::Mat MovDecoder::unpackGPMF(AVPacket packet) {
+  // Unpack an AVPacket to the base GPMF type
   cv::Mat img;
   GPMF_stream metadata_stream, *ms = &metadata_stream;
   int numBytes;
@@ -106,26 +110,26 @@ cv::Mat MovDecoder::playGPMF(AVPacket packet) {
           liboculus::SonarPlayerBase::createGPMFSonarPlayer());
       player->setStream(ms);
       std::shared_ptr<serdp_common::OpenCVDisplay> display;
-      img = sonarDisplay(display, player);
+      img = gpmfImg(display, player);
     }
   }
   return img;
 }
 
-cv::Mat MovDecoder::playVideo(AVPacket packet) {
+cv::Mat MovDecoder::unpackVideo(AVPacket packet) {
+  // Unpack an AVPacket to cv Mat
   cv::Mat img;
+
+  // Something something timestamps?
   av_packet_rescale_ts(
       &packet, pFormatCtx->streams[packet.stream_index]->time_base,
       pFormatCtx->streams[packet.stream_index]->codec->time_base);
-  AVCodecContext *pCodecCtxOrig = NULL;
-  int frameFinished;
 
-  int numBytes;
-  uint8_t *buffer = NULL;
-
+  // decode packet
   int got_frame;
   avcodec_decode_video2(pCodecCtx, pFrame, &got_frame, &packet);
   if (got_frame) {
+    // Cast packet to image
     sws_scale(sws_ctx, (uint8_t const *const *)pFrame->data, pFrame->linesize,
               0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
 
@@ -137,24 +141,32 @@ cv::Mat MovDecoder::playVideo(AVPacket packet) {
 
 DecodedPacket MovDecoder::decodePacket(AVPacket packet,
                                        std::vector<int> streamCodecVec) {
+  // Decode ffmpeg packet to cv image types
   DecodedPacket decodedPacket;
   cv::Mat img;
+
+  // Get frame
   pFrame = av_frame_alloc();
+
   if (streamCodecVec.at(packet.stream_index) == AVMEDIA_TYPE_VIDEO) {
+    // Standard video encoding
     std::string cam_img =
         nameConstants.cameraImage + std::to_string(packet.stream_index);
     decodedPacket.name = cam_img;
     decodedPacket.type = AVMEDIA_TYPE_VIDEO;
 
-    img = playVideo(packet);
+    img = unpackVideo(packet);
+
   } else if (streamCodecVec.at(packet.stream_index) == AVMEDIA_TYPE_GPMF) {
+    // GPMF encoding
     std::string cam_img =
         nameConstants.sonarImg + std::to_string(packet.stream_index);
     decodedPacket.name = cam_img;
     decodedPacket.type = AVMEDIA_TYPE_GPMF;
 
-    img = playGPMF(packet);
+    img = unpackGPMF(packet);
   }
+
   decodedPacket.img = img;
 
   return decodedPacket;

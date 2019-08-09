@@ -8,7 +8,6 @@
 // Orignal tutorial at http://dranger.com/ffmpeg/tutorial01.html
 
 #include "MovDecoder.h"
-
 #include <CLI/CLI.hpp>
 
 int decodeMP4(char *filename);
@@ -29,7 +28,10 @@ int main(int argc, char *argv[]) {
     LOG(FATAL) << "Blank inputfile";
     return -1;
   }
+
+  // Main function
   int ret = decodeMP4(argv[1]);
+
   return ret;
 }
 
@@ -37,10 +39,14 @@ int decodeMP4(char *filename) {
   MovDecoder movDecoder;
   // std::unique_ptr<active_object::Active> _thread;
 
-  if (avformat_open_input(&movDecoder.pFormatCtx, filename, NULL, NULL) != 0)
-    return -1; // Couldn't open file
-  if (avformat_find_stream_info(movDecoder.pFormatCtx, NULL) > 0)
-    return -1; // Couldn't find stream information
+  if (avformat_open_input(&movDecoder.pFormatCtx, filename, NULL, NULL) != 0) {
+    LOG(FATAL) << "Couldn't open file";
+    return -1;
+  }
+  if (avformat_find_stream_info(movDecoder.pFormatCtx, NULL) > 0) {
+    LOG(FATAL) << "Couldn't open file";
+    return -1;
+  }
 
   // Print mov information
   av_dump_format(movDecoder.pFormatCtx, 0, filename, 0);
