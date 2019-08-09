@@ -40,7 +40,7 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 fips_begin_module( serdpplayer )
 
-  fips_src( lib *.cpp )
+  fips_src( lib )
 
   fips_deps( gpmf g3log g3logger oculus serdp_common activeobject)
 

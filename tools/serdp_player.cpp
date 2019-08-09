@@ -1,96 +1,22 @@
-#include <iostream>
-#include <libg3logger/g3logger.h>
-
-#include "liboculus/SonarPlayer.h"
-
-#include "serdp_common/OpenCVDisplay.h"
-#include "serdp_common/PingDecoder.h"
-
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-
-#include "active_object/active.h"
-
-extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavformat/avformat.h>
-#include <libswscale/swscale.h>
-
-#include <stdint.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h>
-
-//#include "GPMF_mp4reader.h"
-}
+#include "MovDecoder.h"
 
 using namespace cv;
 
 #define AVMEDIA_TYPE_VIDEO 0
 #define AVMEDIA_TYPE_GPMF 2
 
-void singleSonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
-                        std::shared_ptr<liboculus::SonarPlayerBase> player) {
-
-  std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
-  if (ping->valid()) {
-    serdp_common::PingDecoder pingDecoder;
-    serdp_common::PingDecoder::SonarData sonarData =
-        pingDecoder.pingPlayback(ping);
-    display->sonarDisplay(ping);
-    cv::waitKey(1);
-  }
-}
-
-int playGPMF(GPMF_stream *ms) {
-  if (GPMF_RawDataSize(ms) > 0) {
-    // Find all the available Streams and the data carrying FourCC
-    int ret = GPMF_FindNext(ms, GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS);
-    // std::cout << ret << " " << GPMF_OK << std::endl;
-    while (GPMF_OK == ret) {
-      ret = GPMF_SeekToSamples(ms);
-      // Display sonar
-      std::shared_ptr<liboculus::SonarPlayerBase> player(
-          liboculus::SonarPlayerBase::createGPMFSonarPlayer());
-      player->setStream(ms);
-      std::shared_ptr<serdp_common::OpenCVDisplay> display;
-      singleSonarDisplay(display, player);
-    }
-  }
-}
-
-int playVideo(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVFrame *pFrameRGB,
-              struct SwsContext *sws_ctx, AVPacket packet, int id) {
-  AVCodecContext *pCodecCtxOrig = NULL;
-  int frameFinished;
-
-  int numBytes;
-  uint8_t *buffer = NULL;
-
-  int got_frame;
-  avcodec_decode_video2(pCodecCtx, pFrame, &got_frame, &packet);
-  if (got_frame) {
-    sws_scale(sws_ctx, (uint8_t const *const *)pFrame->data, pFrame->linesize,
-              0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
-
-    cv::Mat img(pFrame->height, pFrame->width, CV_8UC3, pFrameRGB->data[0]);
-    cv::cvtColor(img, img, CV_BGR2RGB);
-    std::string cam_img = "cam img" + std::to_string(id);
-    cv::imshow(cam_img, img);
-    cv::waitKey(1);
-  }
-}
-
 int decodeMP4(char *filename) {
+  MovDecoder movDecoder;
+
   std::unique_ptr<active_object::Active> _thread;
 
   AVFormatContext *pFormatCtx = NULL;
   AVCodec *pCodec = NULL;
   AVCodecContext *pCodecCtx = NULL;
-
   AVFrame *pFrame = NULL;
+  bool foundVideo(false);
+  int videoStream = -1;
+  struct SwsContext *sws_ctx = NULL;
 
   if (avformat_open_input(&pFormatCtx, filename, NULL, NULL) != 0)
     return -1; // Couldn't open file
@@ -99,12 +25,9 @@ int decodeMP4(char *filename) {
 
   // Dump information about file onto standard error
   av_dump_format(pFormatCtx, 0, filename, 0);
-  int i;
-  // Find the first video stream
-  bool foundVideo(false);
-  int videoStream = -1;
+
   int streamCodecArr[pFormatCtx->nb_streams];
-  for (i = 0; i < pFormatCtx->nb_streams; i++) {
+  for (int i = 0; i < pFormatCtx->nb_streams; i++) {
     if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO &&
         !foundVideo) {
       videoStream = i;
@@ -129,7 +52,6 @@ int decodeMP4(char *filename) {
   }
 
   // READING DATA
-  struct SwsContext *sws_ctx = NULL;
   AVPacket packet;
 
   // initialize SWS context for software scaling
@@ -143,24 +65,23 @@ int decodeMP4(char *filename) {
   if (pFrameRGB == NULL)
     return -1;
 
+  // construct the buffer
   int numBytes =
       avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
-
   uint8_t *buffer = (uint8_t *)av_malloc(numBytes * sizeof(uint8_t));
-
   avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_BGR24,
                  pCodecCtx->width, pCodecCtx->height);
 
   while (av_read_frame(pFormatCtx, &packet) >= 0) {
-    // Is this a packet from the video stream?
+    // Read through packets, decode as either video or GPMF
     pFrame = av_frame_alloc();
     if (streamCodecArr[packet.stream_index] == AVMEDIA_TYPE_VIDEO) {
       // If img packet, play image
       av_packet_rescale_ts(
           &packet, pFormatCtx->streams[packet.stream_index]->time_base,
           pFormatCtx->streams[packet.stream_index]->codec->time_base);
-      playVideo(pCodecCtx, pFrame, pFrameRGB, sws_ctx, packet,
-                packet.stream_index);
+      movDecoder.playVideo(pCodecCtx, pFrame, pFrameRGB, sws_ctx, packet,
+                           packet.stream_index);
     }
 
     else if (streamCodecArr[packet.stream_index] == AVMEDIA_TYPE_GPMF) {
@@ -173,9 +94,9 @@ int decodeMP4(char *filename) {
       if (ret != GPMF_OK)
         return -1;
       if (_thread) {
-        _thread->send(std::bind(playGPMF, ms));
+        //_thread->send(std::bind(playGPMF, ms));
       } else {
-        playGPMF(ms);
+        movDecoder.playGPMF(ms);
       }
     }
     av_free_packet(&packet);
