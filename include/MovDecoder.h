@@ -39,26 +39,9 @@ struct DecodedPacket {
 };
 
 class MovDecoder {
-  // AVFormatContext *_pFormatCtx;
-  // AVCodec *_pCodec;
-  // AVCodecContext *_pCodecCtx;
-  // AVFrame *_pFrame;
-  // struct SwsContext *_sws_ctx;
-  // AVFrame *_pFrameRGB;
-  // uint8_t *_buffer;
-  // int videoStream;
-
 public:
   MovDecoder();
   ~MovDecoder();
-  // Private accessors //
-  // AVFormatContext *pFormatCtx() { return _pFormatCtx; }
-  // AVCodec *pCodec() { return _pCodec; }
-  // AVCodecContext *pCodecCtx() { return _pCodecCtx; }
-  // AVFrame *pFrame() { return _pFrame; }
-  // SwsContext *sws_ctx() { return _sws_ctx; }
-  // AVFrame *pFrameRGB() { return _pFrameRGB; }
-  // uint8_t *buffer() { return _buffer; }
 
   AVFormatContext *pFormatCtx;
   AVCodec *pCodec;

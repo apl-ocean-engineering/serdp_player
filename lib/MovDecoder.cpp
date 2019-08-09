@@ -14,9 +14,11 @@ MovDecoder::~MovDecoder() {
   av_free(pFrame);
   // Close the codecs
   avcodec_close(pCodecCtx);
+  // avcodec_close(pCodec);
   // Close the video file
   avformat_close_input(&pFormatCtx);
 }
+
 std::vector<int> MovDecoder::streamCodecParse() {
   bool foundVideo(false);
   std::vector<int> vec;
@@ -50,7 +52,6 @@ MovDecoder::sonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
 }
 
 cv::Mat MovDecoder::playGPMF(AVPacket packet) {
-
   cv::Mat img;
   GPMF_stream metadata_stream, *ms = &metadata_stream;
   int numBytes;
