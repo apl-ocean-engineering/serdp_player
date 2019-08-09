@@ -24,11 +24,56 @@ extern "C" {
 #include <sys/types.h>
 }
 
+#define AVMEDIA_TYPE_VIDEO 0
+#define AVMEDIA_TYPE_GPMF 2
+
+const struct NameConstants {
+  std::string cameraImage = "cam img";
+  std::string sonarImg = "sonar img";
+} nameConstants;
+
+struct DecodedPacket {
+  std::string name;
+  int type;
+  cv::Mat img;
+};
+
 class MovDecoder {
+  // AVFormatContext *_pFormatCtx;
+  // AVCodec *_pCodec;
+  // AVCodecContext *_pCodecCtx;
+  // AVFrame *_pFrame;
+  // struct SwsContext *_sws_ctx;
+  // AVFrame *_pFrameRGB;
+  // uint8_t *_buffer;
+  // int videoStream;
+
 public:
-  void SonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
-                    std::shared_ptr<liboculus::SonarPlayerBase> player);
-  int playGPMF(GPMF_stream *ms);
-  int playVideo(AVCodecContext *pCodecCtx, AVFrame *pFrame, AVFrame *pFrameRGB,
-                struct SwsContext *sws_ctx, AVPacket packet, int id);
+  MovDecoder();
+  ~MovDecoder();
+  // Private accessors //
+  // AVFormatContext *pFormatCtx() { return _pFormatCtx; }
+  // AVCodec *pCodec() { return _pCodec; }
+  // AVCodecContext *pCodecCtx() { return _pCodecCtx; }
+  // AVFrame *pFrame() { return _pFrame; }
+  // SwsContext *sws_ctx() { return _sws_ctx; }
+  // AVFrame *pFrameRGB() { return _pFrameRGB; }
+  // uint8_t *buffer() { return _buffer; }
+
+  AVFormatContext *pFormatCtx;
+  AVCodec *pCodec;
+  AVCodecContext *pCodecCtx;
+  AVFrame *pFrame;
+  struct SwsContext *sws_ctx;
+  AVFrame *pFrameRGB;
+  uint8_t *buffer;
+  int videoStream;
+
+  // CORE CODE //
+  std::vector<int> streamCodecParse();
+  cv::Mat sonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
+                       std::shared_ptr<liboculus::SonarPlayerBase> player);
+  cv::Mat playGPMF(AVPacket packet);
+  cv::Mat playVideo(AVPacket packet);
+  DecodedPacket decodePacket(AVPacket packet, std::vector<int> streamCodecVec);
 };
