@@ -103,6 +103,7 @@ cv::Mat MovDecoder::unpackGPMF(AVPacket packet) {
   if (GPMF_RawDataSize(ms) > 0) {
     // Find all the available Streams and the data carrying FourCC
     int ret = GPMF_FindNext(ms, GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS);
+    LOG(DEBUG) << "Unpacking GPMF data";
     while (GPMF_OK == ret) {
       ret = GPMF_SeekToSamples(ms);
       // Display sonar
@@ -112,6 +113,8 @@ cv::Mat MovDecoder::unpackGPMF(AVPacket packet) {
       std::shared_ptr<serdp_common::OpenCVDisplay> display;
       img = gpmfImg(display, player);
     }
+  } else {
+    LOG(DEBUG) << "No GPMF data found";
   }
   return img;
 }
@@ -129,12 +132,15 @@ cv::Mat MovDecoder::unpackVideo(AVPacket packet) {
   int got_frame;
   avcodec_decode_video2(pCodecCtx, pFrame, &got_frame, &packet);
   if (got_frame) {
+    LOG(DEBUG) << "Unpacking video data";
     // Cast packet to image
     sws_scale(sws_ctx, (uint8_t const *const *)pFrame->data, pFrame->linesize,
               0, pCodecCtx->height, pFrameRGB->data, pFrameRGB->linesize);
 
     img = cv::Mat(pFrame->height, pFrame->width, CV_8UC3, pFrameRGB->data[0]);
     cv::cvtColor(img, img, CV_BGR2RGB);
+  } else {
+    LOG(DEBUG) << "No video to unpack";
   }
   return img;
 }
