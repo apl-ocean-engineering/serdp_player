@@ -36,6 +36,39 @@ std::vector<int> MovDecoder::streamCodecParse() {
   return vec;
 }
 
+void MovDecoder::initCodecs() {
+  pCodecCtx = pFormatCtx->streams[videoStream]->codec;
+  pCodec = avcodec_find_decoder(pCodecCtx->codec_id);
+
+  if (pCodec == NULL) {
+    LOG(FATAL) << "Unsupported codec!";
+    return;
+  }
+  if (avcodec_open2(pCodecCtx, pCodec, NULL) > 0) {
+    LOG(FATAL) << "Unsupported codec!";
+    return;
+  }
+
+  // initialize SWS context for software scaling
+  sws_ctx = sws_getContext(
+      pCodecCtx->width, pCodecCtx->height, pCodecCtx->pix_fmt, pCodecCtx->width,
+      pCodecCtx->height, AV_PIX_FMT_RGB24, SWS_BILINEAR, NULL, NULL, NULL);
+  pFrameRGB = av_frame_alloc();
+  if (pFrameRGB == NULL) {
+    LOG(FATAL) << "Null frame!";
+    return;
+  }
+
+  // construct the buffer
+  int numBytes =
+      avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+  buffer = (uint8_t *)av_malloc(numBytes * sizeof(uint8_t));
+
+  // Construct the inital image
+  avpicture_fill((AVPicture *)pFrameRGB, buffer, AV_PIX_FMT_BGR24,
+                 pCodecCtx->width, pCodecCtx->height);
+}
+
 cv::Mat
 MovDecoder::sonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
                          std::shared_ptr<liboculus::SonarPlayerBase> player) {

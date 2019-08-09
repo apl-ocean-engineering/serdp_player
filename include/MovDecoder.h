@@ -54,6 +54,7 @@ public:
 
   // CORE CODE //
   std::vector<int> streamCodecParse();
+  void initCodecs();
   cv::Mat sonarDisplay(std::shared_ptr<serdp_common::OpenCVDisplay> display,
                        std::shared_ptr<liboculus::SonarPlayerBase> player);
   cv::Mat playGPMF(AVPacket packet);
