@@ -1,13 +1,13 @@
-#
-# serdp_player
-#
----
-
-# external dependencies
 imports:
     serdp-common:
         git: https://github.com/apl-ocean-engineering/serdp_common.git
         branch: mitchell_dev
+
+exports:
+    modules:
+      serdp_player: .
+    header_dirs:
+      - include
 
 defines:
   FIPS_EXCEPTIONS: ON
