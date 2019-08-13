@@ -7,6 +7,7 @@
 
 // Orignal tutorial at http://dranger.com/ffmpeg/tutorial01.html
 
+#include "libg3logger/g3logger.h"
 #include "serdp_player/MovDecoder.h"
 #include <CLI/CLI.hpp>
 

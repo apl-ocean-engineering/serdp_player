@@ -1,5 +1,4 @@
 #include <iostream>
-#include <libg3logger/g3logger.h>
 
 #include "liboculus/SonarPlayer.h"
 

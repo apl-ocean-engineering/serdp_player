@@ -90,24 +90,19 @@ if (FIPS_CONFIG)
 
 else()
     project(serdp_player)
-    find_package(catkin REQUIRED COMPONENTS
+
+    find_package(catkin REQUIRED
       gpmf 
       g3log_catkin
-      liboculus
+      liboculus REQUIRED
       serdp_common
       active_object
     )
 
-    include_directories(
-      ${catkin_INCLUDE_DIRS}
-      include/
-      ${liboculus_INCLUDE_DIRS}
-   )
-
     catkin_package(
-    	CATKIN_DEPENDS liboculus serdp_common gpmf
+    	CATKIN_DEPENDS liboculus gpmf
         INCLUDE_DIRS include
-        libraries serdp_player_LIB
+        LIBRARIES serdp_player_LIB
     )
 
     include_directories(
