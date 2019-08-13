@@ -7,7 +7,7 @@
 
 // Orignal tutorial at http://dranger.com/ffmpeg/tutorial01.html
 
-#include "MovDecoder.h"
+#include "serdp_player/MovDecoder.h"
 #include <CLI/CLI.hpp>
 
 int decodeMP4(char *filename);
