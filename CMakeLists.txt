@@ -117,16 +117,16 @@ else()
     
 
     file(GLOB serdp_player_SRCS
-	lib/*cpp
-        #thirdparty/gpmf-parser/*.c
+	lib/ROS/*cpp
+        lib/serdp_player/*cpp
       ) 
     
 
     add_library(serdp_player_LIB ${serdp_player_SRCS})
     target_link_libraries(serdp_player_LIB ${catkin_LIBRARIES} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES} ${OpenCV_LIBS} ${serdp_common_LIBRARIES})
     
-    add_executable(serdp_player_ROS tools/serdp_player_ROS.cpp)
-    target_link_libraries(serdp_player_ROS serdp_player_LIB )
+    add_executable(serdp_player_ros tools/serdp_player_ros.cpp)
+    target_link_libraries(serdp_player_ros serdp_player_LIB )
 
 
 
