@@ -1,0 +1,29 @@
+		g3log created log at: Fri Aug 16 16:28:02 2019
+		LOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message		(uuu*: microseconds fractions of the seconds value)
+
+2019/08/16 16:28:02 754756	INFO [g3logger.h->logBanner:29]	Starting log.
+2019/08/16 16:28:02 760251	INFO [serdp_player_ros.cpp->main:38]	Recieved input file /home/mitchell/SERDP_WS/serdp_osb_nov_2018/raw_data/11-15-2018/3d2r2/vid_20181115_084557.mov
+2019/08/16 16:28:02 807417	INFO [MovDecoder.cpp->openFile:32]	Successfully Opened file
+2019/08/16 16:28:02 808104	DEBUG [MovDecoder.cpp->unpackGPMF:129]	No GPMF data found
+2019/08/16 16:28:02 808120	DEBUG [serdp_player_ros.cpp->main:69]	No valid image found
+2019/08/16 16:28:02 808281
+
+***** FATAL SIGNAL RECEIVED ******* 
+Received fatal signal: SIGSEGV(11)	PID: 54084
+
+***** SIGNAL SIGSEGV(11)
+
+*******	STACKDUMP *******
+	stack dump [1]  /home/mitchell/SERDP_catkin_ws/devel/.private/g3log_catkin/lib/g3log_catkin/src/g3log-build/libg3logger.so.1.3.2-81+0x1067e [0x7fc4fe0ee67e]
+	stack dump [2]  /lib/x86_64-linux-gnu/libpthread.so.0+0x12890 [0x7fc4fd2be890]
+
+	stack dump [3]  /home/mitchell/SERDP_catkin_ws/devel/lib/libserdp_player_LIB.so : ROSEncode::GPMF2ROS(std::shared_ptr<serdp_common::SonarData>)+0x37 [0x7fc4fe3204ca]
+	stack dump [4]  /home/mitchell/SERDP_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0x123d2 [0x55994edff3d2]
+	stack dump [5]  /lib/x86_64-linux-gnu/libc.so.6__libc_start_main+0xe7 [0x7fc4fabb4b97]
+	stack dump [6]  /home/mitchell/SERDP_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0x1175a [0x55994edfe75a]
+
+Exiting after fatal event  (FATAL_SIGNAL). Fatal type:  SIGSEGV
+Log content flushed sucessfully to sink
+
+
+g3log g3FileSink shutdown at: 16:28:02 808568

@@ -6,7 +6,10 @@
 
 #include "imaging_sonar_msgs/ImagingSonarMsg.h"
 
+#include "serdp_player/MovDecoder.h"
+
 namespace ROSEncode {
-sensor_msgs::Image img2ROS(cv::Mat img);
-imaging_sonar_msgs::ImagingSonarMsg GPMF2ROS(cv::Mat img);
+sensor_msgs::ImagePtr img2ROS(cv::Mat img);
+imaging_sonar_msgs::ImagingSonarMsg
+GPMF2ROS(std::shared_ptr<serdp_common::SonarData> sonarData);
 } // namespace ROSEncode

@@ -1,6 +1,5 @@
 #include "ros/ros.h"
 
-#include "serdp_player/MovDecoder.h"
 #include "serdp_player/ROSEncode.h"
 
 #include "g3_to_ros_logger/ROSLogSink.h"
@@ -73,10 +72,11 @@ int main(int argc, char **argv) {
     //
     if (decodedPacket.type == AVMEDIA_TYPE_VIDEO) {
 
-      sensor_msgs::Image ros_img = ROSEncode::img2ROS(decodedPacket.data.img);
+      sensor_msgs::ImagePtr ros_img =
+          ROSEncode::img2ROS(decodedPacket.data.img);
     } else if (decodedPacket.type == AVMEDIA_TYPE_GPMF) {
       imaging_sonar_msgs::ImagingSonarMsg sonar_img =
-          ROSEncode::GPMF2ROS(decodedPacket.data.img);
+          ROSEncode::GPMF2ROS(decodedPacket.data.sonarData);
     } else {
       LOG(WARNING) << "Invalid data type decoded";
     }
