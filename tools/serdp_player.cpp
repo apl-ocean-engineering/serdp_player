@@ -69,13 +69,14 @@ int decodeMP4(char *filename) {
     // Read through packets, decode as either video or GPMF
     DecodedPacket decodedPacket =
         movDecoder.decodePacket(packet, streamCodecVec);
-    if (decodedPacket.img.rows < 60 | decodedPacket.img.cols < 60) {
-      LOG(DEBUG) << "No valid image found";
-    } else {
+    if (decodedPacket.data.img.rows > 60 | decodedPacket.data.img.cols > 60) {
       // Display
-      cv::imshow(decodedPacket.name, decodedPacket.img);
+      cv::imshow(decodedPacket.name, decodedPacket.data.img);
       cv::waitKey(1);
+    } else {
+      LOG(DEBUG) << "No valid image found";
     }
+
     av_free_packet(&packet);
   }
 }
