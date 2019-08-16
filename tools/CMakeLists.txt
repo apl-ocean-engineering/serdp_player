@@ -1,5 +1,5 @@
 fips_begin_app(serdp_player cmdline)
-  fips_files( serdp_player.cpp)
+  fips_files( serdp_player_fips.cpp)
   fips_deps(gpmf oculus serdpplayer serdp_common activeobject)
 fips_include_directories(
       ${CMAKE_CURRENT_SOURCE_DIR}
