@@ -49,7 +49,7 @@ set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 if (FIPS_CONFIG)
 	fips_begin_module( serdpplayer )
 
-	  fips_src( lib )
+	  fips_src( lib/serdp_player )
 
 	  fips_deps( gpmf g3log g3logger oculus serdp_common activeobject)
 
@@ -125,6 +125,10 @@ else()
     add_library(serdp_player_LIB ${serdp_player_SRCS})
     target_link_libraries(serdp_player_LIB ${catkin_LIBRARIES} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES} ${OpenCV_LIBS} ${serdp_common_LIBRARIES})
     
+    add_executable(serdp_player_ROS tools/serdp_player_ROS.cpp)
+    target_link_libraries(serdp_player_ROS serdp_player_LIB )
+
+
 
 
     install(TARGETS serdp_player_LIB
@@ -137,8 +141,8 @@ else()
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
         FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
         PATTERN ".git" EXCLUDE)
-    add_executable(serdp_player_ROS src/serdp_player_ROS.cpp)
-    target_link_libraries(serdp_player_ROS serdp_player_LIB )
+
+
 
 
 
