@@ -31,10 +31,18 @@ const struct NameConstants {
   std::string sonarImg = "sonar img";
 } nameConstants;
 
+struct PacketData {
+  PacketData() : sonarData(nullptr) { ; }
+  cv::Mat img;
+  std::shared_ptr<serdp_common::SonarData>
+      sonarData; // Null if packet type is image
+};
+
 struct DecodedPacket {
   std::string name;
   int type;
-  cv::Mat img;
+  // cv::Mat img;
+  PacketData data;
 };
 
 class MovDecoder {
@@ -42,6 +50,7 @@ public:
   MovDecoder();
   ~MovDecoder();
 
+  // FFmpeg frame data types
   AVFormatContext *pFormatCtx;
   AVCodec *pCodec;
   AVCodecContext *pCodecCtx;
@@ -51,11 +60,14 @@ public:
   uint8_t *buffer;
   int videoStream;
 
+  // Init ffmpeg functions
+  int openFile(char *filename);
   std::vector<int> streamCodecParse();
   void initCodecs();
-  cv::Mat gpmfImg(std::shared_ptr<serdp_common::OpenCVDisplay> display,
-                  std::shared_ptr<liboculus::SonarPlayerBase> player);
-  cv::Mat unpackGPMF(AVPacket packet);
-  cv::Mat unpackVideo(AVPacket packet);
+
+  // Actual functions
+  PacketData unpackGPMF(AVPacket packet);
+  PacketData unpackVideo(AVPacket packet);
+
   DecodedPacket decodePacket(AVPacket packet, std::vector<int> streamCodecVec);
 };

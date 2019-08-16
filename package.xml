@@ -22,6 +22,10 @@
   <depend>liboculus</depend>
   <depend>serdp_common</depend>
   <depend>gpmf</depend>
+  <depend>sensor_msgs</depend>
+  <depend>cv_bridge</depend>
+  <depend>image_transport</depend>
+  <depend>imaging_sonar_msgs</depend>
 
   <export>
     <!-- You can specify that this package is a metapackage here: -->

@@ -99,10 +99,13 @@ else()
       serdp_common
       active_object
       cv_bridge
+      sensor_msgs
+      image_transport
+      imaging_sonar_msgs
     )
 
     catkin_package(
-    	CATKIN_DEPENDS liboculus gpmf
+    	CATKIN_DEPENDS liboculus gpmf sensor_msgs imaging_sonar_msgs
         INCLUDE_DIRS include
         LIBRARIES serdp_player_LIB
     )

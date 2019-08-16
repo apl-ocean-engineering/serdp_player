@@ -1,11 +1,10 @@
 #include "ros/ros.h"
 
 #include "serdp_player/MovDecoder.h"
+#include "serdp_player/ROSEncode.h"
 
 #include "g3_to_ros_logger/ROSLogSink.h"
 #include "g3_to_ros_logger/g3logger.h"
-
-int decodeMP4(char *filename);
 
 int main(int argc, char **argv) {
   av_register_all();
@@ -19,8 +18,15 @@ int main(int argc, char **argv) {
   ros::init(argc, argv, "serdp_player_ROS");
   ros::NodeHandle nh_;
 
+  ros::Publisher imgPub = nh_.advertise<sensor_msgs::Image>("camera_image", 1);
+  ros::Publisher sonarPub =
+      nh_.advertise<imaging_sonar_msgs::ImagingSonarMsg>("sonar_msg", 1);
+
   std::string inputFilename("");
   nh_.getParam("mov_filename", inputFilename);
+
+  bool display(true);
+  nh_.getParam("display", display);
 
   char *filename[inputFilename.size() + 1];
   strcpy(*filename, inputFilename.c_str());
@@ -32,29 +38,10 @@ int main(int argc, char **argv) {
 
   LOG(INFO) << "Recieved input file " << inputFilename;
 
-  // Main function
-  int ret = decodeMP4(*filename);
-
-  return 0;
-}
-
-int decodeMP4(char *filename) {
   MovDecoder movDecoder;
   // std::unique_ptr<active_object::Active> _thread;
 
-  if (avformat_open_input(&movDecoder.pFormatCtx, filename, NULL, NULL) != 0) {
-    LOG(FATAL) << "Couldn't open file";
-    return -1;
-  }
-  if (avformat_find_stream_info(movDecoder.pFormatCtx, NULL) > 0) {
-    LOG(FATAL) << "Couldn't open file";
-    return -1;
-  }
-
-  LOG(INFO) << "Opened file";
-
-  // Print mov information
-  av_dump_format(movDecoder.pFormatCtx, 0, filename, 0);
+  movDecoder.openFile(*filename);
 
   // Determine stream codec types
   std::vector<int> streamCodecVec = movDecoder.streamCodecParse();
@@ -73,13 +60,29 @@ int decodeMP4(char *filename) {
     // Read through packets, decode as either video or GPMF
     DecodedPacket decodedPacket =
         movDecoder.decodePacket(packet, streamCodecVec);
-    if (decodedPacket.img.rows < 60 | decodedPacket.img.cols < 60) {
-      LOG(DEBUG) << "No valid image found";
-    } else {
-      // Display
-      cv::imshow(decodedPacket.name, decodedPacket.img);
-      cv::waitKey(1);
+    //
+    if (display) {
+      if (decodedPacket.data.img.rows > 60 | decodedPacket.data.img.cols > 60) {
+        // Display
+        cv::imshow(decodedPacket.name, decodedPacket.data.img);
+        cv::waitKey(1);
+      } else {
+        LOG(DEBUG) << "No valid image found";
+      }
     }
+    //
+    if (decodedPacket.type == AVMEDIA_TYPE_VIDEO) {
+
+      sensor_msgs::Image ros_img = ROSEncode::img2ROS(decodedPacket.data.img);
+    } else if (decodedPacket.type == AVMEDIA_TYPE_GPMF) {
+      imaging_sonar_msgs::ImagingSonarMsg sonar_img =
+          ROSEncode::GPMF2ROS(decodedPacket.data.img);
+    } else {
+      LOG(WARNING) << "Invalid data type decoded";
+    }
+
     av_free_packet(&packet);
   }
+
+  return 0;
 }
