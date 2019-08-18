@@ -74,9 +74,11 @@ int main(int argc, char **argv) {
 
       sensor_msgs::ImagePtr ros_img =
           ROSEncode::img2ROS(decodedPacket.data.img);
+      imgPub.publish(ros_img);
     } else if (decodedPacket.type == AVMEDIA_TYPE_GPMF) {
       imaging_sonar_msgs::ImagingSonarMsg sonar_img =
           ROSEncode::GPMF2ROS(decodedPacket.data.sonarData);
+      sonarPub.publish(sonar_img);
     } else {
       LOG(WARNING) << "Invalid data type decoded";
     }

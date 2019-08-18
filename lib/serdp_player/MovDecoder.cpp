@@ -118,16 +118,19 @@ PacketData MovDecoder::unpackGPMF(AVPacket packet) {
       if (ping->valid()) {
         serdp_common::PingDecoder pingDecoder;
         sonarData = pingDecoder.pingPlayback(ping);
+
         cv::Mat img = display->sonarPing2Img(ping);
 
         data.img = img;
         data.sonarData = sonarData;
       }
+
       // data = gpmfImg(display, player);
     }
   } else {
     LOG(DEBUG) << "No GPMF data found";
   }
+  // std::cout << data.sonarData->nBearings << std::endl;
   return data;
 }
 

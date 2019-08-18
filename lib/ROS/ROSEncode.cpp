@@ -15,30 +15,35 @@ imaging_sonar_msgs::ImagingSonarMsg
 GPMF2ROS(std::shared_ptr<serdp_common::SonarData> sonarData) {
   imaging_sonar_msgs::ImagingSonarMsg sonar_msg;
 
+  if (!sonarData)
+    return sonar_msg;
+
   float bearing, range;
   uint intensity;
 
-  float *bearings = sonarData->bearings;
+  std::vector<float> bearings = sonarData->bearings;
+  std::vector<float> ranges = sonarData->ranges;
+  std::vector<float> intensities = sonarData->intensities;
+
+  // std::cout << sonarData->nBearings << std::endl;
 
   for (unsigned int b = 0; b < sonarData->nBearings; b++) {
-    // bearing = *bearings;
-    // sonar_msg.bearings.push_back(bearing);
-    std::cout << bearings << std::endl;
-    bearings++;
+    bearing = bearings.at(b);
+    sonar_msg.bearings.push_back(bearing);
   }
-  // for (unsigned int i = 0; i < sonarData->nRanges; i++) {
-  //   range = sonarData->ranges[i];
-  //   sonar_msg.ranges.push_back(range);
-  // }
-  // int count(0);
-  // for (unsigned int r = 0; r < sonarData->nRanges; r++) {
-  //   for (unsigned int b = 0; b < sonarData->nBearings; b++) {
-  //     intensity = sonarData->intensities[count];
-  //     sonar_msg.v2intensities.push_back(intensity);
-  //
-  //     count++;
-  //   }
-  // }
+  for (unsigned int i = 0; i < sonarData->nRanges; i++) {
+    range = ranges.at(i);
+    sonar_msg.ranges.push_back(range);
+  }
+  int count(0);
+  for (unsigned int r = 0; r < sonarData->nRanges; r++) {
+    for (unsigned int b = 0; b < sonarData->nBearings; b++) {
+      intensity = intensities.at(count);
+      sonar_msg.v2intensities.push_back(intensity);
+
+      count++;
+    }
+  }
 
   return sonar_msg;
 }
