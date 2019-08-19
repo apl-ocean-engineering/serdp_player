@@ -143,6 +143,9 @@ PacketData MovDecoder::unpackVideo(AVPacket packet) {
       &packet, pFormatCtx->streams[packet.stream_index]->time_base,
       pFormatCtx->streams[packet.stream_index]->codec->time_base);
 
+  // std::cout << "stream index: " << packet.stream_index << std::endl;
+  // std::cout << "timestamp: " << packet.dts << std::endl;
+
   // decode packet
   int got_frame;
   avcodec_decode_video2(pCodecCtx, pFrame, &got_frame, &packet);
@@ -172,6 +175,8 @@ DecodedPacket MovDecoder::decodePacket(AVPacket packet,
 
   // Get frame
   pFrame = av_frame_alloc();
+
+  //std::cout << "index2 " << packet.stream_index << std::endl;
 
   if (streamCodecVec.at(packet.stream_index) == AVMEDIA_TYPE_VIDEO) {
     // Standard video encoding

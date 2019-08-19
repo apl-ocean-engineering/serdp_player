@@ -23,6 +23,7 @@ extern "C" {
 #include <sys/types.h>
 }
 
+#define VIDEO_TIMESTAMP_STEP 400 //video timestamps increment by 400, for some reason
 #define AVMEDIA_TYPE_VIDEO 0
 #define AVMEDIA_TYPE_GPMF 2
 

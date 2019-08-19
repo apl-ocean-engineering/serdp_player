@@ -1,0 +1,28 @@
+		g3log created log at: Mon Aug 19 09:40:32 2019
+		LOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message		(uuu*: microseconds fractions of the seconds value)
+
+2019/08/19 09:40:32 970636	INFO [g3logger.h->logBanner:29]	Starting log.
+2019/08/19 09:40:32 974901	INFO [serdp_player_ros.cpp->main:40]	Recieved input file /home/mitchell/serdp_ws/vid_20181115_084557.mov
+2019/08/19 09:40:33 024103	INFO [MovDecoder.cpp->openFile:32]	Successfully Opened file
+2019/08/19 09:40:34 243484
+
+***** FATAL SIGNAL RECEIVED ******* 
+Received fatal signal: SIGSEGV(11)	PID: 29056
+
+***** SIGNAL SIGSEGV(11)
+
+*******	STACKDUMP *******
+	stack dump [1]  /home/mitchell/serdp_catkin_ws/devel/.private/g3log_catkin/lib/g3log_catkin/src/g3log-build/libg3logger.so.1.3.2-81+0x1067e [0x7fdb6ae8867e]
+	stack dump [2]  /lib/x86_64-linux-gnu/libpthread.so.0+0x12890 [0x7fdb6a493890]
+	stack dump [3]  /lib/x86_64-linux-gnu/libc.so.6cfree+0x3d [0x7fdb6800d98d]
+
+	stack dump [4]  /opt/ros/melodic/lib/libroscpp.so : ros::NodeHandle::~NodeHandle()+0x38 [0x7fdb6abd9b58]
+	stack dump [5]  /home/mitchell/serdp_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0xa827 [0x5563f3fea827]
+	stack dump [6]  /lib/x86_64-linux-gnu/libc.so.6__libc_start_main+0xe7 [0x7fdb67f97b97]
+	stack dump [7]  /home/mitchell/serdp_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0xb2aa [0x5563f3feb2aa]
+
+Exiting after fatal event  (FATAL_SIGNAL). Fatal type:  SIGSEGV
+Log content flushed sucessfully to sink
+
+
+g3log g3FileSink shutdown at: 09:40:34 244104

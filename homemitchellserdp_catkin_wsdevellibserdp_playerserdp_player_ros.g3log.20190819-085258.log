@@ -1,0 +1,169 @@
+		g3log created log at: Mon Aug 19 08:52:58 2019
+		LOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message		(uuu*: microseconds fractions of the seconds value)
+
+2019/08/19 08:52:58 757659	INFO [g3logger.h->logBanner:29]	Starting log.
+2019/08/19 08:52:58 761728	INFO [serdp_player_ros.cpp->main:38]	Recieved input file /home/mitchell/serdp_ws/vid_20181115_084557.mov
+2019/08/19 08:52:58 811462	INFO [MovDecoder.cpp->openFile:32]	Successfully Opened file
+2019/08/19 08:52:58 812218	DEBUG [MovDecoder.cpp->unpackGPMF:131]	No GPMF data found
+2019/08/19 08:52:58 812224	DEBUG [serdp_player_ros.cpp->main:69]	No valid image found
+2019/08/19 08:52:58 812229	DEBUG [MovDecoder.cpp->unpackGPMF:131]	No GPMF data found
+2019/08/19 08:52:58 812230	DEBUG [serdp_player_ros.cpp->main:69]	No valid image found
+2019/08/19 08:52:58 835723	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:58 900359	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:58 938788	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:58 972833	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 006884	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 041201	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 092941	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 130329	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 176054	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 210813	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 249472	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 283443	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 297934	DEBUG [MovDecoder.cpp->unpackGPMF:109]	Unpacking GPMF data
+2019/08/19 08:52:59 298016	DEBUG [SimplePingResult.h->set:104]	Loaded 256 bearings
+2019/08/19 08:52:59 298021	DEBUG [SimplePingResult.h->set:140]	Loaded 703 x 256 imaging data
+2019/08/19 08:52:59 298023	DEBUG [SimplePingResult.h->valid:197]	     Mode: 
+2019/08/19 08:52:59 298029	DEBUG [SimplePingResult.h->valid:198]	Ping rate: 195
+2019/08/19 08:52:59 298032	DEBUG [SimplePingResult.h->valid:200]	  Ping ID: 415323
+2019/08/19 08:52:59 298034	DEBUG [SimplePingResult.h->valid:201]	   Status: 0
+2019/08/19 08:52:59 298035	DEBUG [SimplePingResult.h->valid:202]	   Ping start time3103899264
+2019/08/19 08:52:59 298063	DEBUG [SimplePingResult.h->valid:204]	Frequency: 2.09888e+06
+2019/08/19 08:52:59 298066	DEBUG [SimplePingResult.h->valid:205]	Temperature: 2.59965e-76
+2019/08/19 08:52:59 298070	DEBUG [SimplePingResult.h->valid:206]	 Pressure: -1.37331e+194
+2019/08/19 08:52:59 298073	DEBUG [SimplePingResult.h->valid:207]	Spd of Sound: 1490.66
+2019/08/19 08:52:59 298078	DEBUG [SimplePingResult.h->valid:208]	Range res: 0.00284219 m
+2019/08/19 08:52:59 298081	DEBUG [SimplePingResult.h->valid:210]	Num range: 703
+2019/08/19 08:52:59 298081	DEBUG [SimplePingResult.h->valid:211]	Num beams: 256
+2019/08/19 08:52:59 298082	DEBUG [SimplePingResult.h->valid:213]	  Image size: 179968
+2019/08/19 08:52:59 298085	DEBUG [SimplePingResult.h->valid:214]	Image offset: 2048
+2019/08/19 08:52:59 298087	DEBUG [SimplePingResult.h->valid:215]	   Data size: 8-bit
+2019/08/19 08:52:59 298089	DEBUG [SimplePingResult.h->valid:216]	Message size: 182016
+2019/08/19 08:52:59 299627	DEBUG [DrawSonar.cpp->drawSonar:27]	binThickness is 0
+2019/08/19 08:52:59 329290	DEBUG [SimplePingResult.h->set:104]	Loaded 256 bearings
+2019/08/19 08:52:59 329297	DEBUG [SimplePingResult.h->set:140]	Loaded 703 x 256 imaging data
+2019/08/19 08:52:59 329299	DEBUG [SimplePingResult.h->valid:197]	     Mode: 
+2019/08/19 08:52:59 329301	DEBUG [SimplePingResult.h->valid:198]	Ping rate: 195
+2019/08/19 08:52:59 329302	DEBUG [SimplePingResult.h->valid:200]	  Ping ID: 415323
+2019/08/19 08:52:59 329304	DEBUG [SimplePingResult.h->valid:201]	   Status: 0
+2019/08/19 08:52:59 329306	DEBUG [SimplePingResult.h->valid:202]	   Ping start time3103899264
+2019/08/19 08:52:59 329315	DEBUG [SimplePingResult.h->valid:204]	Frequency: 2.09888e+06
+2019/08/19 08:52:59 329319	DEBUG [SimplePingResult.h->valid:205]	Temperature: 2.59965e-76
+2019/08/19 08:52:59 329322	DEBUG [SimplePingResult.h->valid:206]	 Pressure: -1.37331e+194
+2019/08/19 08:52:59 329325	DEBUG [SimplePingResult.h->valid:207]	Spd of Sound: 1490.66
+2019/08/19 08:52:59 329327	DEBUG [SimplePingResult.h->valid:208]	Range res: 0.00284219 m
+2019/08/19 08:52:59 329336	DEBUG [SimplePingResult.h->valid:210]	Num range: 703
+2019/08/19 08:52:59 329337	DEBUG [SimplePingResult.h->valid:211]	Num beams: 256
+2019/08/19 08:52:59 329342	DEBUG [SimplePingResult.h->valid:213]	  Image size: 179968
+2019/08/19 08:52:59 329343	DEBUG [SimplePingResult.h->valid:214]	Image offset: 2048
+2019/08/19 08:52:59 329344	DEBUG [SimplePingResult.h->valid:215]	   Data size: 8-bit
+2019/08/19 08:52:59 329358	DEBUG [SimplePingResult.h->valid:216]	Message size: 182016
+2019/08/19 08:52:59 330480	DEBUG [DrawSonar.cpp->drawSonar:27]	binThickness is 0
+2019/08/19 08:52:59 384112	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 431717	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 479692	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 529558	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 567285	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 601902	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 637433	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 674762	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 714455	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 752685	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 790157	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 830504	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 864995	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 899385	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 934665	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:52:59 970591	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 011766	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 052002	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 090519	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 130631	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 177507	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 221998	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 264609	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 307222	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 349234	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 388803	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 430574	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 475991	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 519672	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 556373	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 570729	DEBUG [MovDecoder.cpp->unpackGPMF:109]	Unpacking GPMF data
+2019/08/19 08:53:00 570766	DEBUG [SimplePingResult.h->set:104]	Loaded 256 bearings
+2019/08/19 08:53:00 570770	DEBUG [SimplePingResult.h->set:140]	Loaded 703 x 256 imaging data
+2019/08/19 08:53:00 570771	DEBUG [SimplePingResult.h->valid:197]	     Mode: 
+2019/08/19 08:53:00 570774	DEBUG [SimplePingResult.h->valid:198]	Ping rate: 195
+2019/08/19 08:53:00 570776	DEBUG [SimplePingResult.h->valid:200]	  Ping ID: 415324
+2019/08/19 08:53:00 570777	DEBUG [SimplePingResult.h->valid:201]	   Status: 0
+2019/08/19 08:53:00 570781	DEBUG [SimplePingResult.h->valid:202]	   Ping start time3166401394
+2019/08/19 08:53:00 570793	DEBUG [SimplePingResult.h->valid:204]	Frequency: 2.09888e+06
+2019/08/19 08:53:00 570797	DEBUG [SimplePingResult.h->valid:205]	Temperature: 2.59965e-76
+2019/08/19 08:53:00 570800	DEBUG [SimplePingResult.h->valid:206]	 Pressure: -1.37331e+194
+2019/08/19 08:53:00 570803	DEBUG [SimplePingResult.h->valid:207]	Spd of Sound: 1490.66
+2019/08/19 08:53:00 570806	DEBUG [SimplePingResult.h->valid:208]	Range res: 0.00284219 m
+2019/08/19 08:53:00 570810	DEBUG [SimplePingResult.h->valid:210]	Num range: 703
+2019/08/19 08:53:00 570812	DEBUG [SimplePingResult.h->valid:211]	Num beams: 256
+2019/08/19 08:53:00 570827	DEBUG [SimplePingResult.h->valid:213]	  Image size: 179968
+2019/08/19 08:53:00 570835	DEBUG [SimplePingResult.h->valid:214]	Image offset: 2048
+2019/08/19 08:53:00 570852	DEBUG [SimplePingResult.h->valid:215]	   Data size: 8-bit
+2019/08/19 08:53:00 570853	DEBUG [SimplePingResult.h->valid:216]	Message size: 182016
+2019/08/19 08:53:00 574037	DEBUG [DrawSonar.cpp->drawSonar:27]	binThickness is 0
+2019/08/19 08:53:00 606302	DEBUG [SimplePingResult.h->set:104]	Loaded 256 bearings
+2019/08/19 08:53:00 606308	DEBUG [SimplePingResult.h->set:140]	Loaded 703 x 256 imaging data
+2019/08/19 08:53:00 606310	DEBUG [SimplePingResult.h->valid:197]	     Mode: 
+2019/08/19 08:53:00 606311	DEBUG [SimplePingResult.h->valid:198]	Ping rate: 195
+2019/08/19 08:53:00 606312	DEBUG [SimplePingResult.h->valid:200]	  Ping ID: 415324
+2019/08/19 08:53:00 606313	DEBUG [SimplePingResult.h->valid:201]	   Status: 0
+2019/08/19 08:53:00 606314	DEBUG [SimplePingResult.h->valid:202]	   Ping start time3166401394
+2019/08/19 08:53:00 606322	DEBUG [SimplePingResult.h->valid:204]	Frequency: 2.09888e+06
+2019/08/19 08:53:00 606324	DEBUG [SimplePingResult.h->valid:205]	Temperature: 2.59965e-76
+2019/08/19 08:53:00 606327	DEBUG [SimplePingResult.h->valid:206]	 Pressure: -1.37331e+194
+2019/08/19 08:53:00 606329	DEBUG [SimplePingResult.h->valid:207]	Spd of Sound: 1490.66
+2019/08/19 08:53:00 606331	DEBUG [SimplePingResult.h->valid:208]	Range res: 0.00284219 m
+2019/08/19 08:53:00 606332	DEBUG [SimplePingResult.h->valid:210]	Num range: 703
+2019/08/19 08:53:00 606332	DEBUG [SimplePingResult.h->valid:211]	Num beams: 256
+2019/08/19 08:53:00 606333	DEBUG [SimplePingResult.h->valid:213]	  Image size: 179968
+2019/08/19 08:53:00 606334	DEBUG [SimplePingResult.h->valid:214]	Image offset: 2048
+2019/08/19 08:53:00 606335	DEBUG [SimplePingResult.h->valid:215]	   Data size: 8-bit
+2019/08/19 08:53:00 606336	DEBUG [SimplePingResult.h->valid:216]	Message size: 182016
+2019/08/19 08:53:00 607317	DEBUG [DrawSonar.cpp->drawSonar:27]	binThickness is 0
+2019/08/19 08:53:00 664321	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 706409	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 743473	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 779637	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 818203	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 864724	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 909860	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 951108	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:00 989741	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 026719	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 064339	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 098509	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 133352	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 167352	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 202297	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 237575	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 275318	DEBUG [MovDecoder.cpp->unpackVideo:152]	Unpacking video data
+2019/08/19 08:53:01 288807
+
+***** FATAL SIGNAL RECEIVED ******* 
+Received fatal signal: SIGSEGV(11)	PID: 22797
+
+***** SIGNAL SIGSEGV(11)
+
+*******	STACKDUMP *******
+	stack dump [1]  /home/mitchell/serdp_catkin_ws/devel/.private/g3log_catkin/lib/g3log_catkin/src/g3log-build/libg3logger.so.1.3.2-81+0x1067e [0x7fb7c498c67e]
+	stack dump [2]  /lib/x86_64-linux-gnu/libpthread.so.0+0x12890 [0x7fb7c3959890]
+	stack dump [3]  /lib/x86_64-linux-gnu/libc.so.6cfree+0x3d [0x7fb7c12c798d]
+
+	stack dump [4]  /opt/ros/melodic/lib/libroscpp.so : ros::NodeHandle::~NodeHandle()+0x38 [0x7fb7c42a2b58]
+	stack dump [5]  /home/mitchell/serdp_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0xb5bd [0x5612ef8165bd]
+	stack dump [6]  /lib/x86_64-linux-gnu/libc.so.6__libc_start_main+0xe7 [0x7fb7c1251b97]
+	stack dump [7]  /home/mitchell/serdp_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0xc10a [0x5612ef81710a]
+
+Exiting after fatal event  (FATAL_SIGNAL). Fatal type:  SIGSEGV
+Log content flushed sucessfully to sink
+
+
+g3log g3FileSink shutdown at: 08:53:01 289090

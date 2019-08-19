@@ -1,0 +1,34 @@
+		g3log created log at: Mon Aug 19 12:20:21 2019
+		LOG format: [YYYY/MM/DD hh:mm:ss uuu* LEVEL FILE->FUNCTION:LINE] message		(uuu*: microseconds fractions of the seconds value)
+
+2019/08/19 12:20:21 647071	INFO [g3logger.h->logBanner:29]	Starting log.
+2019/08/19 12:20:21 650897	INFO [serdp_player_ros.cpp->main:40]	Recieved input file /home/mitchell/serdp_ws/vid_20181115_084557.mov
+2019/08/19 12:20:21 702706	INFO [MovDecoder.cpp->openFile:32]	Successfully Opened file
+2019/08/19 12:20:21 703658
+
+***** FATAL SIGNAL RECEIVED ******* 
+Received fatal signal: SIGABRT(6)	PID: 13926
+
+***** SIGNAL SIGABRT(6)
+
+*******	STACKDUMP *******
+	stack dump [1]  /home/mitchell/serdp_catkin_ws/devel/.private/g3log_catkin/lib/g3log_catkin/src/g3log-build/libg3logger.so.1.3.2-81+0x1067e [0x7f320b97167e]
+	stack dump [2]  /lib/x86_64-linux-gnu/libpthread.so.0+0x12890 [0x7f320a93e890]
+	stack dump [3]  /lib/x86_64-linux-gnu/libc.so.6gsignal+0xc7 [0x7f3208253e97]
+	stack dump [4]  /lib/x86_64-linux-gnu/libc.so.6abort+0x141 [0x7f3208255801]
+	stack dump [5]  /usr/lib/x86_64-linux-gnu/libstdc++.so.6+0x8c957 [0x7f32088aa957]
+	stack dump [6]  /usr/lib/x86_64-linux-gnu/libstdc++.so.6+0x92ab6 [0x7f32088b0ab6]
+	stack dump [7]  /usr/lib/x86_64-linux-gnu/libstdc++.so.6+0x92af1 [0x7f32088b0af1]
+	stack dump [8]  /usr/lib/x86_64-linux-gnu/libstdc++.so.6+0x92d24 [0x7f32088b0d24]
+	stack dump [9]  /usr/lib/x86_64-linux-gnu/libstdc++.so.6+0x8e855 [0x7f32088ac855]
+
+	stack dump [10]  /home/mitchell/serdp_catkin_ws/devel/lib/libserdp_player_LIB.so : MovDecoder::decodePacket(AVPacket, std::vector<int, std::allocator<int> >)+0xe9e [0x7f320bb9fd2e]
+	stack dump [11]  /home/mitchell/serdp_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0xbb23 [0x5607ab14eb23]
+	stack dump [12]  /lib/x86_64-linux-gnu/libc.so.6__libc_start_main+0xe7 [0x7f3208236b97]
+	stack dump [13]  /home/mitchell/serdp_catkin_ws/devel/lib/serdp_player/serdp_player_ros+0xc7ea [0x5607ab14f7ea]
+
+Exiting after fatal event  (FATAL_SIGNAL). Fatal type:  SIGABRT
+Log content flushed sucessfully to sink
+
+
+g3log g3FileSink shutdown at: 12:20:21 703921
