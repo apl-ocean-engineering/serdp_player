@@ -7,9 +7,10 @@
  </include>
 
 
- <arg name="mov_ROS_name" default="mov_to_bag" doc="Serdp_player name"/>
+ <arg name="mov_ROS_name" default="topics_to_bag" doc="Serdp_player name"/>
  <arg name="bag_filename" default="$(env HOME)/out.bag" doc="Location to save output bagfile"/>
-  <node name="mov_to_bag" pkg="serdp_recorder_ros" type="$(arg mov_ROS_name)">
+
+  <node name="topics_to_bag" pkg="serdp_recorder_ros" type="$(arg mov_ROS_name)">
     <param name="save_bag_location" type="string" value="$(arg bag_filename)" />
   </node>
 </launch>
