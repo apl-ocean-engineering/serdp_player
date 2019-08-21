@@ -14,15 +14,21 @@ int main(int argc, char **argv) {
   logWorker.verbose(2);
 
   // init ros
-  ros::init(argc, argv, "serdp_player_ROS");
-  ros::NodeHandle nh_;
+  ros::init(argc, argv, "serdp_player_ros");
+  ros::NodeHandle nh_("serdp_player_ros");
 
-  ros::Publisher imgPub = nh_.advertise<sensor_msgs::Image>("camera_image", 1);
+  ros::Publisher imgPubLeft =
+      nh_.advertise<sensor_msgs::Image>("camera_image_left", 1);
+  ros::Publisher imgPubRight =
+      nh_.advertise<sensor_msgs::Image>("camera_image_right", 1);
   ros::Publisher sonarPub =
       nh_.advertise<imaging_sonar_msgs::ImagingSonarMsg>("sonar_msg", 1);
 
   std::string inputFilename("");
-  nh_.getParam("mov_filename", inputFilename);
+
+  nh_.getParam(nh_.resolveName("mov_filename"), inputFilename);
+
+  LOG(INFO) << "Recieved input file " << inputFilename;
 
   bool display(true);
   nh_.getParam("display", display);
@@ -34,8 +40,6 @@ int main(int argc, char **argv) {
     LOG(FATAL) << "Blank inputfile";
     return -1;
   }
-
-  LOG(INFO) << "Recieved input file " << inputFilename;
 
   MovDecoder movDecoder;
   // std::unique_ptr<active_object::Active> _thread;
@@ -74,7 +78,10 @@ int main(int argc, char **argv) {
 
       sensor_msgs::ImagePtr ros_img =
           ROSEncode::img2ROS(decodedPacket.data.img);
-      imgPub.publish(ros_img);
+      if (packet.stream_index == 0)
+        imgPubLeft.publish(ros_img);
+      else if (packet.stream_index == 1)
+        imgPubRight.publish(ros_img);
     } else if (decodedPacket.type == AVMEDIA_TYPE_GPMF) {
       imaging_sonar_msgs::ImagingSonarMsg sonar_img =
           ROSEncode::GPMF2ROS(decodedPacket.data.sonarData);

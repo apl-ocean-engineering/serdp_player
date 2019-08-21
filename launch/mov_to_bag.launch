@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Annoying ROS issues.. have to include this in two locations -->
+  <!--
+  <arg name="display" default="true" doc="To display images or not"/>
+  <arg name="left_image" default="camera_image_left" doc="Left image topic"/>
+  <arg name="right_image" default="camera_image_right" doc="Right image topic"/>
+  <arg name="sonar_image" default="sonar_msg" doc="Sonar message topic"/> -->
+  <arg name="mov_filename" default="$(env HOME)/vid.mov" doc="Location of mov_file"/>
+
+  <include file="serdp_player.launch">
+    <arg name="mov_filename" value="$(arg mov_filename)" />
+    <!-- OMG why do I need to add all this -->
+    <!-- <arg name="display" value="$(arg display)" />
+
+    <arg name="left_image" value="$(arg left_image)" />
+    <arg name="right_image" value="$(arg right_image)" />
+    <arg name="sonar_image" value="$(arg sonar_image)" /> -->
+ </include>
+
+
+ <arg name="mov_ROS_name" default="mov_to_bag" doc="Serdp_player name"/>
+ <arg name="bag_filename" default="$(env HOME)/out.bag" doc="Location to save output bagfile"/>
+  <node name="mov_to_bag" pkg="serdp_player" type="$(arg mov_ROS_name)">
+    <param name="save_bag_location" type="string" value="$(arg bag_filename)" />
+
+    <!-- <remap from="$(arg mov_ROS_name)/camera_image_left" to="$(arg left_image)" />
+    <remap from="$(arg mov_ROS_name)/camera_image_right" to="$(arg right_image)" />
+    <remap from="$(arg mov_ROS_name)/sonar_image" to="$(arg sonar_image)" /> -->
+  </node>
+</launch>

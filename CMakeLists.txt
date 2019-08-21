@@ -43,7 +43,7 @@ find_library(AVUTIL_LIBRARIES avutil)
 
 
 
-## C++ flags applied to all builds 
+## C++ flags applied to all builds
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if (FIPS_CONFIG)
@@ -93,7 +93,7 @@ else()
 
     find_package(catkin REQUIRED
       roscpp
-      gpmf 
+      gpmf
       g3log_catkin
       liboculus REQUIRED
       serdp_common
@@ -102,10 +102,11 @@ else()
       sensor_msgs
       image_transport
       imaging_sonar_msgs
+			rosbag
     )
 
     catkin_package(
-    	CATKIN_DEPENDS liboculus gpmf sensor_msgs imaging_sonar_msgs
+    	CATKIN_DEPENDS liboculus gpmf sensor_msgs imaging_sonar_msgs rosbag
         INCLUDE_DIRS include
         LIBRARIES serdp_player_LIB
     )
@@ -114,19 +115,22 @@ else()
         ${catkin_INCLUDE_DIRS}
         include
       )
-    
+
 
     file(GLOB serdp_player_SRCS
 	lib/ROS/*cpp
         lib/serdp_player/*cpp
-      ) 
-    
+      )
+
 
     add_library(serdp_player_LIB ${serdp_player_SRCS})
     target_link_libraries(serdp_player_LIB ${catkin_LIBRARIES} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES} ${OpenCV_LIBS} ${serdp_common_LIBRARIES})
-    
+
     add_executable(serdp_player_ros tools/serdp_player_ros.cpp)
     target_link_libraries(serdp_player_ros serdp_player_LIB )
+
+		add_executable(mov_to_bag tools/mov_to_bag.cpp)
+		target_link_libraries(mov_to_bag serdp_player_LIB )
 
 
 
@@ -147,15 +151,3 @@ else()
 
 
 endif()
-
-
-
-
-
-
-
-
-
-
-
-
