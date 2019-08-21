@@ -8,6 +8,11 @@ Code consists of both [ROS](https://www.ros.org/) and (limited-functionality) [f
 ### Install
 To install, clone [dependent repositories](https://gitlab.com/apl-ocean-engineering/aploe_ros_repos/blob/master/blackmagic_oculus.repos) to a catkin_ws/src and import using [vcs](https://github.com/dirk-thomas/vcstool). Building using catkin_make or catkin_tools (catkin build).  
 
+*NOTE* You need to manually initialize the gpmf submodule:  
+$ cd <ws>/src/gpmf  
+$ git submodule init  
+$ git submodule update  
+
 ### Running
 The ROS code consists on two nodes: serdp_player_ros and mov_to_bag.   
 1. serdp_plyaer_ros: Parses a specified  .mov into GPMF and imgs, (optionally) displays images, and publishes proper ROS messages.  
