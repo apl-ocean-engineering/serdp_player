@@ -108,34 +108,31 @@ PacketData MovDecoder::unpackGPMF(AVPacket packet) {
     int ret = GPMF_FindNext(ms, GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS);
     LOG(DEBUG) << "Unpacking GPMF data";
     while (GPMF_OK == ret) {
+      // Setup GPMF player
       ret = GPMF_SeekToSamples(ms);
-      // Display sonar
       std::shared_ptr<liboculus::SonarPlayerBase> player(
           liboculus::SonarPlayerBase::createGPMFSonarPlayer());
       player->setStream(ms);
-      std::shared_ptr<serdp_common::OpenCVDisplay> display;
+
       std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
       if (ping->valid()) {
-        serdp_common::PingDecoder pingDecoder;
-        sonarData = pingDecoder.pingPlayback(ping);
+        // If the ping is a valid GPMF type, upack sonar data and img
 
+        sonarData = pingDecoder.pingPlayback(ping);
         cv::Mat img = display->sonarPing2Img(ping);
 
         data.img = img;
         data.sonarData = sonarData;
       }
-
-      // data = gpmfImg(display, player);
     }
   } else {
     LOG(DEBUG) << "No GPMF data found";
   }
-  // std::cout << data.sonarData->nBearings << std::endl;
   return data;
 }
 
 PacketData MovDecoder::unpackVideo(AVPacket packet) {
-  // Unpack an AVPacket to cv Mat
+  // Unpack an AVPacket to PacketData type
   PacketData data;
 
   // Something something timestamps?
@@ -165,7 +162,7 @@ PacketData MovDecoder::unpackVideo(AVPacket packet) {
 
 DecodedPacket MovDecoder::decodePacket(AVPacket packet,
                                        std::vector<int> streamCodecVec) {
-  // Decode ffmpeg packet to cv image types
+  // Decode ffmpeg packet to DecodedPacket type
   DecodedPacket decodedPacket;
 
   PacketData packetData;
@@ -174,21 +171,23 @@ DecodedPacket MovDecoder::decodePacket(AVPacket packet,
   pFrame = av_frame_alloc();
 
   if (streamCodecVec.at(packet.stream_index) == AVMEDIA_TYPE_VIDEO) {
-    // Standard video encoding
+    // Standard video decoding
     std::string cam_img =
         nameConstants.cameraImage + std::to_string(packet.stream_index);
     decodedPacket.name = cam_img;
     decodedPacket.type = AVMEDIA_TYPE_VIDEO;
 
+    // If video type, unpack as video
     packetData = unpackVideo(packet);
 
   } else if (streamCodecVec.at(packet.stream_index) == AVMEDIA_TYPE_GPMF) {
-    // GPMF encoding
+    // GPMF decoding
     std::string cam_img =
         nameConstants.sonarImg + std::to_string(packet.stream_index);
     decodedPacket.name = cam_img;
     decodedPacket.type = AVMEDIA_TYPE_GPMF;
 
+    // if GPMF type, unpack as GPMF
     packetData = unpackGPMF(packet);
   }
 

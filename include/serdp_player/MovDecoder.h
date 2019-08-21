@@ -46,6 +46,10 @@ struct DecodedPacket {
 };
 
 class MovDecoder {
+  // Ping decoder types
+  serdp_common::PingDecoder pingDecoder;
+  std::shared_ptr<serdp_common::OpenCVDisplay> display;
+
 public:
   MovDecoder();
   ~MovDecoder();
