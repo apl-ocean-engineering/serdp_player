@@ -21,7 +21,7 @@ To run, use launch file and point to specified .mov locations:
 Run roslaunch --ros-args serdp_player <launch_name> for full argument list.  
 
 
-##fips
+## fips
 Main tool only reads and displays .mov code
 
 ### Install
