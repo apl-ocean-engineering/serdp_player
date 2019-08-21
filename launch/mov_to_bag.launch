@@ -8,7 +8,7 @@
   <arg name="sonar_image" default="sonar_msg" doc="Sonar message topic"/> -->
   <arg name="mov_filename" default="$(env HOME)/vid.mov" doc="Location of mov_file"/>
 
-  <include file="serdp_player.launch">
+  <include file="$(find serdp_player)/launch/serdp_player.launch">
     <arg name="mov_filename" value="$(arg mov_filename)" />
     <!-- OMG why do I need to add all this -->
     <!-- <arg name="display" value="$(arg display)" />
