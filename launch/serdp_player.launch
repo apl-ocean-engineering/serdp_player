@@ -15,7 +15,7 @@
 
     <remap from="$(arg name)/camera_image_left" to="$(arg left_image)" />
     <remap from="$(arg name)/camera_image_right" to="$(arg right_image)" />
-    <remap from="$(arg name)/sonar_image" to="$(arg sonar_image)" />
+    <remap from="$(arg name)/sonar_msg" to="$(arg sonar_image)" />
   </node>
 
 </launch>
