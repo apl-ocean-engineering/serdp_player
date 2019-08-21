@@ -129,9 +129,6 @@ else()
     add_executable(serdp_player_ros tools/serdp_player_ros.cpp)
     target_link_libraries(serdp_player_ros serdp_player_LIB )
 
-		add_executable(mov_to_bag tools/mov_to_bag.cpp)
-		target_link_libraries(mov_to_bag serdp_player_LIB )
-
 
 
 
