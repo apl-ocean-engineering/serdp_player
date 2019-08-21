@@ -102,7 +102,7 @@ else()
       sensor_msgs
       image_transport
       imaging_sonar_msgs
-			rosbag
+      rosbag
     )
 
     catkin_package(
