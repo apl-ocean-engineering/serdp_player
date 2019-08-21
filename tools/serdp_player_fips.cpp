@@ -22,6 +22,9 @@ int main(int argc, char *argv[]) {
   std::string inputFilename("");
   app.add_option("input", inputFilename,
                  ".mov or .mp4 file to read video and GPMF data from");
+  bool display(true);
+  app.add_option("-d, --display", display,
+                 "to display or not the GPMF and video data read for MOV/Mp4");
 
   CLI11_PARSE(app, argc, argv);
 
@@ -30,27 +33,12 @@ int main(int argc, char *argv[]) {
     return -1;
   }
 
-  // Main function
-  int ret = decodeMP4(argv[1]);
+  char *filename[inputFilename.size() + 1];
+  strcpy(*filename, inputFilename.c_str());
 
-  return ret;
-}
-
-int decodeMP4(char *filename) {
   MovDecoder movDecoder;
-  // std::unique_ptr<active_object::Active> _thread;
 
-  if (avformat_open_input(&movDecoder.pFormatCtx, filename, NULL, NULL) != 0) {
-    LOG(FATAL) << "Couldn't open file";
-    return -1;
-  }
-  if (avformat_find_stream_info(movDecoder.pFormatCtx, NULL) > 0) {
-    LOG(FATAL) << "Couldn't open file";
-    return -1;
-  }
-
-  // Print mov information
-  av_dump_format(movDecoder.pFormatCtx, 0, filename, 0);
+  movDecoder.openFile(*filename);
 
   // Determine stream codec types
   std::vector<int> streamCodecVec = movDecoder.streamCodecParse();
@@ -69,7 +57,8 @@ int decodeMP4(char *filename) {
     // Read through packets, decode as either video or GPMF
     DecodedPacket decodedPacket =
         movDecoder.decodePacket(packet, streamCodecVec);
-    if (decodedPacket.data.img.rows > 60 | decodedPacket.data.img.cols > 60) {
+    if (decodedPacket.data.img.rows > 60 && decodedPacket.data.img.cols > 60 &&
+        display) {
       // Display
       cv::imshow(decodedPacket.name, decodedPacket.data.img);
       cv::waitKey(1);

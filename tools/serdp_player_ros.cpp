@@ -33,13 +33,13 @@ int main(int argc, char **argv) {
   bool display(true);
   nh_.getParam("display", display);
 
-  char *filename[inputFilename.size() + 1];
-  strcpy(*filename, inputFilename.c_str());
-
   if (inputFilename.empty()) {
     LOG(FATAL) << "Blank inputfile";
     return -1;
   }
+
+  char *filename[inputFilename.size() + 1];
+  strcpy(*filename, inputFilename.c_str());
 
   MovDecoder movDecoder;
   // std::unique_ptr<active_object::Active> _thread;
@@ -65,7 +65,8 @@ int main(int argc, char **argv) {
         movDecoder.decodePacket(packet, streamCodecVec);
     //
     if (display) {
-      if (decodedPacket.data.img.rows > 60 | decodedPacket.data.img.cols > 60) {
+      if (decodedPacket.data.img.rows > 60 &&
+          decodedPacket.data.img.cols > 60) {
         // Display
         cv::imshow(decodedPacket.name, decodedPacket.data.img);
         cv::waitKey(1);
