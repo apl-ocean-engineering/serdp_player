@@ -11,6 +11,8 @@
 #include "serdp_player/MovDecoder.h"
 #include <CLI/CLI.hpp>
 
+using namespace Decoder;
+
 int decodeMP4(char *filename);
 
 int main(int argc, char *argv[]) {

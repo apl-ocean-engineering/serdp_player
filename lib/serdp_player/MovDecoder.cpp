@@ -2,6 +2,15 @@
 
 using namespace cv;
 
+namespace Decoder {
+SonarPoint bearingRange2Cartesian(float bearing, float range) {
+  float x = range * sin(bearing);
+  float z = range * cos(bearing);
+
+  SonarPoint p(x, z);
+  return p;
+}
+
 MovDecoder::MovDecoder()
     : pFormatCtx(NULL), pCodec(NULL), pCodecCtx(NULL), pFrame(NULL),
       pFrameRGB(NULL), sws_ctx(NULL), buffer(NULL), videoStream(0) {}
@@ -117,11 +126,13 @@ PacketData MovDecoder::unpackGPMF(AVPacket packet) {
       std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
       if (ping->valid()) {
         // If the ping is a valid GPMF type, upack sonar data and img
-
         sonarData = pingDecoder.pingPlayback(ping);
         cv::Mat img = display->sonarPing2Img(ping);
+        // Channel three is intensity, best for display
+        Mat bgr[3];
+        cv::split(img, bgr); // split
 
-        data.img = img;
+        data.img = bgr[2];
         data.sonarData = sonarData;
       }
     }
@@ -195,3 +206,4 @@ DecodedPacket MovDecoder::decodePacket(AVPacket packet,
 
   return decodedPacket;
 }
+} // namespace Decoder

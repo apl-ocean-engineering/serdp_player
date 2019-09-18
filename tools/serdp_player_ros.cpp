@@ -5,6 +5,8 @@
 #include "g3_to_ros_logger/ROSLogSink.h"
 #include "g3_to_ros_logger/g3logger.h"
 
+using namespace Decoder;
+
 int main(int argc, char **argv) {
   av_register_all();
 

@@ -9,6 +9,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 
 #include "active_object/active.h"
+#include <math.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
@@ -26,6 +27,14 @@ extern "C" {
 #define AVMEDIA_TYPE_VIDEO 0
 #define AVMEDIA_TYPE_GPMF 2
 
+namespace Decoder {
+
+struct SonarPoint {
+  SonarPoint(float _x, float _z) : x(_x), z(_z) { ; }
+  float x;
+  float z;
+};
+
 const struct NameConstants {
   std::string cameraImage = "cam img";
   std::string sonarImg = "sonar img";
@@ -41,9 +50,10 @@ struct PacketData {
 struct DecodedPacket {
   std::string name;
   int type;
-  // cv::Mat img;
   PacketData data;
 };
+
+SonarPoint bearingRange2Cartesian(float bearing, float range);
 
 class MovDecoder {
   // Ping decoder types
@@ -75,3 +85,4 @@ public:
 
   DecodedPacket decodePacket(AVPacket packet, std::vector<int> streamCodecVec);
 };
+} // namespace Decoder
