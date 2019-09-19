@@ -29,12 +29,6 @@ extern "C" {
 
 namespace Decoder {
 
-struct SonarPoint {
-  SonarPoint(float _x, float _z) : x(_x), z(_z) { ; }
-  float x;
-  float z;
-};
-
 const struct NameConstants {
   std::string cameraImage = "cam img";
   std::string sonarImg = "sonar img";
@@ -52,8 +46,6 @@ struct DecodedPacket {
   int type;
   PacketData data;
 };
-
-SonarPoint bearingRange2Cartesian(float bearing, float range);
 
 class MovDecoder {
   // Ping decoder types

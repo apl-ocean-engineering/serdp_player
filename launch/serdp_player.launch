@@ -9,7 +9,7 @@
 
    <arg name="name" default="serdp_player_ros" doc="Serdp_player name"/>
 
-  <node name="serdp_player_ros" pkg="serdp_player" type="$(arg name)">
+  <node name="serdp_player_ros" pkg="serdp_player" type="$(arg name)" output="screen">
     <param name="mov_filename" type="string" value="$(arg mov_filename)" />
     <param name="display" type="bool" value="$(arg display)" />
 

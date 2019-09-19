@@ -3,13 +3,13 @@
 using namespace cv;
 
 namespace Decoder {
-SonarPoint bearingRange2Cartesian(float bearing, float range) {
-  float x = range * sin(bearing);
-  float z = range * cos(bearing);
 
-  SonarPoint p(x, z);
-  return p;
-}
+// serdp_common::SonarPoint bearingRange2Cartesian(float bearing, float range) {
+//   float x = range * sin(bearing);
+//   float z = range * cos(bearing);
+//
+//   return serdp_common::SonarPoint(x, z);
+// }
 
 MovDecoder::MovDecoder()
     : pFormatCtx(NULL), pCodec(NULL), pCodecCtx(NULL), pFrame(NULL),
@@ -132,7 +132,7 @@ PacketData MovDecoder::unpackGPMF(AVPacket packet) {
         Mat bgr[3];
         cv::split(img, bgr); // split
 
-        data.img = bgr[2];
+        data.img = img; // bgr[2];
         data.sonarData = sonarData;
       }
     }
