@@ -1,5 +1,5 @@
 imports:
-    serdp-common:
+    serdp_common:
         git: https://github.com/apl-ocean-engineering/serdp_common.git
         branch: master
 
