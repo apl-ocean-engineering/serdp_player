@@ -6,7 +6,7 @@ platform:
   os: linux
   arch: amd64
 
-pipeline:
+steps:
 - name: build-fips-unittest
   image: amarburg/lsdslam-dev-host
   commands:
