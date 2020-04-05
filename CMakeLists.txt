@@ -47,6 +47,8 @@ find_library(AVUTIL_LIBRARIES avutil)
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if (FIPS_CONFIG)
+	add_definitions( -DWITH_GPMF )
+
 	fips_begin_module( serdpplayer )
 
 	  fips_src( lib/serdp_player )
