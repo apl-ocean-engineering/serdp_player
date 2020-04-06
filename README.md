@@ -40,7 +40,6 @@ $./fips run serdp_player -- <path_to_mov>
 
 The mov should now be displayed 
 
-
 # License
 
 Licensed under [BSD 3-clause license](LICENSE).
