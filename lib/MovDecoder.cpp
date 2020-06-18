@@ -1,4 +1,34 @@
+/*
+ * Copyright (c) 2017-2020 Aaron Marburg <amarburg@uw.edu>
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ * 3. Neither the name of University of Washington nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #include "serdp_player/MovDecoder.h"
+#include "serdp_common/DrawSonar.h"
 
 using namespace cv;
 
@@ -13,7 +43,8 @@ namespace Decoder {
 
 MovDecoder::MovDecoder()
     : pFormatCtx(NULL), pCodec(NULL), pCodecCtx(NULL), pFrame(NULL),
-      pFrameRGB(NULL), sws_ctx(NULL), buffer(NULL), videoStream(0) {}
+      pFrameRGB(NULL), sws_ctx(NULL), buffer(NULL), videoStream(0)
+{;}
 
 MovDecoder::~MovDecoder() {
   // Free the RGB image
@@ -48,8 +79,9 @@ int MovDecoder::openFile(char *filename) {
 
 std::vector<int> MovDecoder::streamCodecParse() {
   // Find all present codecs
-  bool foundVideo(false);
+  bool foundVideo = false;
   std::vector<int> vec;
+
   for (int i = 0; i < pFormatCtx->nb_streams; i++) {
     if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO &&
         !foundVideo) {
@@ -58,9 +90,9 @@ std::vector<int> MovDecoder::streamCodecParse() {
     }
     vec.push_back(pFormatCtx->streams[i]->codec->codec_type);
   }
-  if (!foundVideo) {
-    return std::vector<int>();
-  }
+
+  if (!foundVideo) return std::vector<int>();
+
   return vec;
 }
 
@@ -89,8 +121,7 @@ void MovDecoder::initCodecs() {
   }
 
   // construct the buffer
-  int numBytes =
-      avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
+  int numBytes = avpicture_get_size(AV_PIX_FMT_RGB24, pCodecCtx->width, pCodecCtx->height);
   buffer = (uint8_t *)av_malloc(numBytes * sizeof(uint8_t));
 
   // Construct the inital image
@@ -98,18 +129,24 @@ void MovDecoder::initCodecs() {
                  pCodecCtx->width, pCodecCtx->height);
 }
 
-PacketData MovDecoder::unpackGPMF(AVPacket packet) {
+DecodedPacket MovDecoder::unpackGPMF(AVPacket packet) {
   // Unpack an AVPacket to the base GPMF type
-  PacketData data;
-  std::shared_ptr<serdp_common::SonarData> sonarData;
+  DecodedPacket decodedPacket;
+  //std::shared_ptr<serdp_common::SonarData> sonarData;
   GPMF_stream metadata_stream, *ms = &metadata_stream;
   int numBytes;
   AVBufferRef *buf = packet.buf;
   int ret = GPMF_Init(ms, (uint32_t *)buf->data, buf->size);
 
+  // GPMF decoding
+  std::string cam_img =
+      nameConstants.sonarImg + std::to_string(packet.stream_index);
+  decodedPacket.name = cam_img;
+  decodedPacket.type = AVMEDIA_TYPE_GPMF;
+
   if (ret != GPMF_OK) {
     LOG(WARNING) << "Metadata stream initalization failure";
-    return data;
+    return decodedPacket;
   }
 
   if (GPMF_RawDataSize(ms) > 0) {
@@ -123,28 +160,36 @@ PacketData MovDecoder::unpackGPMF(AVPacket packet) {
           liboculus::SonarPlayerBase::createGPMFSonarPlayer());
       player->setStream(ms);
 
-      std::shared_ptr<liboculus::SimplePingResult> ping(player->nextPing());
-      if (ping->valid()) {
-        // If the ping is a valid GPMF type, upack sonar data and img
-        sonarData = pingDecoder.pingPlayback(ping);
-        cv::Mat img = display->sonarPing2Img(ping);
-        // Channel three is intensity, best for display
-        Mat bgr[3];
-        cv::split(img, bgr); // split
+      liboculus::SimplePingResult ping;
+      if( !player->nextPing(ping) ) return decodedPacket;
 
-        data.img = img; // bgr[2];
-        data.sonarData = sonarData;
+      if (ping.valid()) {
+        // If the ping is a valid GPMF type, upack sonar data and img
+        //sonarData = pingDecoder.pingPlayback(ping);
+        cv::Size sz = serdp_common::calculateImageSize( ping, cv::Size(0,0) );
+        cv::Mat img( sz, CV_8UC3 );
+        serdp_common::drawSonar( ping, img );
+
+        // // Channel three is intensity, best for display
+        // Mat bgr[3];
+        // cv::split(img, bgr); // split
+
+        decodedPacket.img = img; // bgr[2];
+        //data.sonarData = sonarData;
       }
     }
   } else {
     LOG(DEBUG) << "No GPMF data found";
   }
-  return data;
+  return decodedPacket;
 }
 
-PacketData MovDecoder::unpackVideo(AVPacket packet) {
+DecodedPacket MovDecoder::unpackVideo(AVPacket packet) {
   // Unpack an AVPacket to PacketData type
-  PacketData data;
+  DecodedPacket decodedPacket;
+
+  decodedPacket.name = nameConstants.cameraImage + std::to_string(packet.stream_index);
+  decodedPacket.type = AVMEDIA_TYPE_VIDEO;
 
   // Something something timestamps?
   av_packet_rescale_ts(
@@ -163,47 +208,36 @@ PacketData MovDecoder::unpackVideo(AVPacket packet) {
     cv::Mat img =
         cv::Mat(pFrame->height, pFrame->width, CV_8UC3, pFrameRGB->data[0]);
     cv::cvtColor(img, img, CV_BGR2RGB);
-    data.img = img;
+    decodedPacket.img = img;
+
   } else {
     LOG(DEBUG) << "No video to unpack";
   }
 
-  return data;
+  return decodedPacket;
 }
 
 DecodedPacket MovDecoder::decodePacket(AVPacket packet,
                                        std::vector<int> streamCodecVec) {
-  // Decode ffmpeg packet to DecodedPacket type
-  DecodedPacket decodedPacket;
-
-  PacketData packetData;
 
   // Get frame
   pFrame = av_frame_alloc();
 
   if (streamCodecVec.at(packet.stream_index) == AVMEDIA_TYPE_VIDEO) {
-    // Standard video decoding
-    std::string cam_img =
-        nameConstants.cameraImage + std::to_string(packet.stream_index);
-    decodedPacket.name = cam_img;
-    decodedPacket.type = AVMEDIA_TYPE_VIDEO;
 
     // If video type, unpack as video
-    packetData = unpackVideo(packet);
+    return unpackVideo(packet);
 
   } else if (streamCodecVec.at(packet.stream_index) == AVMEDIA_TYPE_GPMF) {
-    // GPMF decoding
-    std::string cam_img =
-        nameConstants.sonarImg + std::to_string(packet.stream_index);
-    decodedPacket.name = cam_img;
-    decodedPacket.type = AVMEDIA_TYPE_GPMF;
+
 
     // if GPMF type, unpack as GPMF
-    packetData = unpackGPMF(packet);
+    return unpackGPMF(packet);
   }
 
-  decodedPacket.data = packetData;
-
-  return decodedPacket;
+  // Null packet on failure
+  return DecodedPacket();
 }
+
+
 } // namespace Decoder

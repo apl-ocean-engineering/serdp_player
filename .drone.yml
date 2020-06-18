@@ -13,6 +13,15 @@ steps:
     - ./fips set config linux-make-unittest
     - ./fips build
 
+## Build with ROS melodic
+- name: build-ros-melodic
+  image: amarburg/drone-ci-ros:melodic
+  commands:
+    - wget -O- https://gitlab.com/amarburg/ros_drone_ci/-/raw/master/bootstrap.sh | /bin/bash
+  environment:
+    ROS_PACKAGES_TO_INSTALL: cv-bridge image-transport opencv-apps
+    WSTOOL_RECURSIVE: true
+
 - name: slack
   image: plugins/slack
   settings:

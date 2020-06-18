@@ -7,13 +7,21 @@
 
 // Orignal tutorial at http://dranger.com/ffmpeg/tutorial01.html
 
+#include <memory>
+
 #include "libg3logger/g3logger.h"
 #include "serdp_player/MovDecoder.h"
+#include "serdp_common/OpenCVDisplay.h"
 #include <CLI/CLI.hpp>
 
 using namespace Decoder;
+using namespace serdp_common;
 
 int decodeMP4(char *filename);
+
+void keyHandler( const char c ) {
+
+}
 
 int main(int argc, char *argv[]) {
   av_register_all();
@@ -29,6 +37,10 @@ int main(int argc, char *argv[]) {
                  "to display or not the GPMF and video data read for MOV/Mp4");
 
   CLI11_PARSE(app, argc, argv);
+
+  std::unique_ptr<serdp_common::OpenCVDisplay> cvDisplay;
+
+  if( display ) cvDisplay.reset( new OpenCVDisplay(keyHandler) );
 
   if (inputFilename.empty()) {
     LOG(FATAL) << "Blank inputfile";
@@ -57,15 +69,24 @@ int main(int argc, char *argv[]) {
 
   while (av_read_frame(movDecoder.pFormatCtx, &packet) >= 0) {
     // Read through packets, decode as either video or GPMF
-    DecodedPacket decodedPacket =
-        movDecoder.decodePacket(packet, streamCodecVec);
-    if (decodedPacket.data.img.rows > 60 && decodedPacket.data.img.cols > 60 &&
-        display) {
-      // Display
-      cv::imshow(decodedPacket.name, decodedPacket.data.img);
-      cv::waitKey(1);
+    DecodedPacket decodedPacket = movDecoder.decodePacket(packet, streamCodecVec);
+
+    if (decodedPacket.img.rows > 60 &&
+        decodedPacket.img.cols > 60 ) {
+
+      if( cvDisplay ) {
+        if( decodedPacket.type = AVMEDIA_TYPE_GPMF ) {
+          cvDisplay->showVideo( decodedPacket.img, decodedPacket.name );
+        } else if( decodedPacket.type == AVMEDIA_TYPE_VIDEO ) {
+          cvDisplay->showVideo( decodedPacket.img, decodedPacket.name );
+        }
+
+      }
+
     } else {
+
       LOG(DEBUG) << "No valid image found";
+
     }
 
     av_free_packet(&packet);
