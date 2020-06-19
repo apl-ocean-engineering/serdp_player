@@ -2,12 +2,15 @@ imports:
     serdp_common:
         git: https://github.com/apl-ocean-engineering/serdp_common.git
         branch: master
+    serdp_gpmf:
+        git: https://github.com/apl-ocean-engineering/serdp_gpmf.git
+        branch: master
 
 exports:
     modules:
       serdp_player: .
-    header_dirs:
-      - include
+    header-dirs:
+      - include/
 
 defines:
   FIPS_EXCEPTIONS: ON

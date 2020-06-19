@@ -42,19 +42,16 @@ find_library(AVUTIL_LIBRARIES avutil)
 #find_package(FFmpeg REQUIRED)
 
 
-
-
 ## C++ flags applied to all builds
 set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
 
 if (FIPS_CONFIG)
-  add_definitions( -DWITH_GPMF )
 
   fips_begin_module( libserdp_player )
 
     fips_src( lib/ )
 
-    fips_deps( gpmf g3log g3logger oculus serdp_common activeobject)
+    fips_deps( g3logger oculus serdp_common serdp_gpmf activeobject )
 
     fips_include_directories(
       ${CMAKE_SOURCE_DIR}/include
@@ -65,6 +62,7 @@ if (FIPS_CONFIG)
       ${AVFORMAT_INCLUDE_DIR}
       #${AVUTIL_INCLUDE_DIR}
      )
+     
     fips_libs(
        ${OpenCV_LIBS}
        #${FFMPEG_LIBRARIES}
@@ -92,60 +90,61 @@ if (FIPS_CONFIG)
 
 else()
 
-    find_package(catkin REQUIRED
-      roscpp
+  find_package(catkin REQUIRED
+    roscpp
+    gpmf
+    g3log_catkin
+    liboculus REQUIRED
+    serdp_common
+    serdp_gpmf
+    active_object
+    cv_bridge
+    sensor_msgs
+    image_transport
+    imaging_sonar_msgs
+    rosbag
+  )
+
+  catkin_package(
+  	CATKIN_DEPENDS
+      liboculus
       gpmf
-      g3log_catkin
-      liboculus REQUIRED
-      serdp_common
-      active_object
-      cv_bridge
       sensor_msgs
-      image_transport
       imaging_sonar_msgs
       rosbag
+    INCLUDE_DIRS include
+    LIBRARIES serdp_player_LIB
+  )
+
+  include_directories(
+      ${catkin_INCLUDE_DIRS}
+      include
+      ros/include/
     )
 
-    catkin_package(
-    	CATKIN_DEPENDS
-        liboculus
-        gpmf
-        sensor_msgs
-        imaging_sonar_msgs
-        rosbag
-      INCLUDE_DIRS include
-      LIBRARIES serdp_player_LIB
+
+  file(GLOB serdp_player_SRCS
+      ros/lib/*cpp
+      lib/serdp_player/*cpp
     )
 
-    include_directories(
-        ${catkin_INCLUDE_DIRS}
-        include
-        ros/include/
-      )
+
+  add_library(serdp_player ${serdp_player_SRCS})
+  target_link_libraries(serdp_player ${catkin_LIBRARIES} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES} ${OpenCV_LIBS} ${serdp_common_LIBRARIES})
+
+  add_executable(serdp_player_ros ros/tools/serdp_player_ros.cpp)
+  target_link_libraries(serdp_player_ros serdp_player_LIB )
 
 
-    file(GLOB serdp_player_SRCS
-        ros/lib/*cpp
-        lib/serdp_player/*cpp
-      )
+  install(TARGETS serdp_player
+        ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+        RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
 
-
-    add_library(serdp_player ${serdp_player_SRCS})
-    target_link_libraries(serdp_player ${catkin_LIBRARIES} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES} ${OpenCV_LIBS} ${serdp_common_LIBRARIES})
-
-    add_executable(serdp_player_ros ros/tools/serdp_player_ros.cpp)
-    target_link_libraries(serdp_player_ros serdp_player_LIB )
-
-
-    install(TARGETS serdp_player
-          ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-          LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-          RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
-
-    ## Install headers
-    install(DIRECTORY  include/${PROJECT_NAME}/
-        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-        FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
-        PATTERN ".git" EXCLUDE)
+  ## Install headers
+  install(DIRECTORY  include/${PROJECT_NAME}/
+      DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+      FILES_MATCHING PATTERN "*.hpp" PATTERN "*.h"
+      PATTERN ".git" EXCLUDE)
 
 endif()

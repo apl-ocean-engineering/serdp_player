@@ -29,6 +29,7 @@
 
 #include "serdp_player/MovDecoder.h"
 #include "serdp_common/DrawSonar.h"
+#include "serdp_gpmf/GpmfSonarPlayer.h"
 
 using namespace cv;
 
@@ -156,12 +157,13 @@ DecodedPacket MovDecoder::unpackGPMF(AVPacket packet) {
     while (GPMF_OK == ret) {
       // Setup GPMF player
       ret = GPMF_SeekToSamples(ms);
-      std::shared_ptr<liboculus::SonarPlayerBase> player(
-          liboculus::SonarPlayerBase::createGPMFSonarPlayer());
-      player->setStream(ms);
+      //std::shared_ptr<liboculus::SonarPlayerBase> player(serdp_gpmf::createGPMFSonarPlayer());
+
+      serdp_gpmf::GPMFSonarPlayer player(ms);
+      // player->setStream(ms);
 
       liboculus::SimplePingResult ping;
-      if( !player->nextPing(ping) ) return decodedPacket;
+      if( !player.nextPing(ping) ) return decodedPacket;
 
       if (ping.valid()) {
         // If the ping is a valid GPMF type, upack sonar data and img

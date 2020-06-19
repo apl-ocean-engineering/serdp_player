@@ -21,6 +21,7 @@
   <depend>active_object</depend>
   <depend>liboculus</depend>
   <depend>serdp_common</depend>
+  <depend>serdp_gpmf</depend>
   <depend>gpmf</depend>
   <depend>sensor_msgs</depend>
   <depend>cv_bridge</depend>
