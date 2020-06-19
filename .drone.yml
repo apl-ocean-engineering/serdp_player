@@ -8,7 +8,7 @@ platform:
 
 steps:
 - name: build-fips-unittest
-  image: amarburg/lsdslam-dev-host:latest
+  image: amarburg/lsdslam-dev-host-blackmagic:latest
   commands:
     - ./fips set config linux-make-unittest
     - ./fips build
@@ -20,6 +20,7 @@ steps:
     - wget -O- https://gitlab.com/amarburg/ros_drone_ci/-/raw/master/bootstrap.sh | /bin/bash
   environment:
     ROS_PACKAGES_TO_INSTALL: cv-bridge image-transport opencv-apps
+    APT_PACKAGES_TO_INSTALL: libavcodec-dev
     WSTOOL_RECURSIVE: true
 
 - name: slack
