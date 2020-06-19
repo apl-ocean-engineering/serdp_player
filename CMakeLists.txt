@@ -108,7 +108,8 @@ else()
   catkin_package(
   	CATKIN_DEPENDS
       liboculus
-      gpmf
+      serdp_gpmf
+      serdp_common
       sensor_msgs
       imaging_sonar_msgs
       rosbag
@@ -125,18 +126,18 @@ else()
 
   file(GLOB serdp_player_SRCS
       ros/lib/*cpp
-      lib/serdp_player/*cpp
+      lib/*.cpp
     )
 
 
-  add_library(serdp_player ${serdp_player_SRCS})
-  target_link_libraries(serdp_player ${catkin_LIBRARIES} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES} ${OpenCV_LIBS} ${serdp_common_LIBRARIES})
+  add_library(serdp_player_LIB ${serdp_player_SRCS})
+  target_link_libraries(serdp_player_LIB ${catkin_LIBRARIES} ${AVCODEC_LIBRARY} ${AVFORMAT_LIBRARY} ${AVDEVICE_LIBRARY} ${SWSCALE_LIBRARIES} ${AVUTIL_LIBRARIES} ${OpenCV_LIBS} )
 
   add_executable(serdp_player_ros ros/tools/serdp_player_ros.cpp)
   target_link_libraries(serdp_player_ros serdp_player_LIB )
 
 
-  install(TARGETS serdp_player
+  install(TARGETS serdp_player_ros serdp_player_LIB
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_GLOBAL_BIN_DESTINATION})
