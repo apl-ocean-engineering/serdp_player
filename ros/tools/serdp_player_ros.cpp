@@ -48,11 +48,11 @@ int main(int argc, char **argv) {
   ros::NodeHandle nh_("serdp_player_ros");
 
   ros::Publisher imgPubLeft =
-      nh_.advertise<sensor_msgs::Image>("camera_image_left", 1);
+      nh_.advertise<sensor_msgs::Image>("left", 1);
   ros::Publisher imgPubRight =
-      nh_.advertise<sensor_msgs::Image>("camera_image_right", 1);
+      nh_.advertise<sensor_msgs::Image>("right", 1);
   ros::Publisher sonarPub =
-      nh_.advertise<imaging_sonar_msgs::ImagingSonarMsg>("sonar_msg", 1);
+      nh_.advertise<imaging_sonar_msgs::ImagingSonarMsg>("imaging_sonar", 1);
 
   std::string inputFilename("");
 
@@ -91,32 +91,35 @@ int main(int argc, char **argv) {
 
   while (av_read_frame(movDecoder.pFormatCtx, &packet) >= 0 && ros::ok()) {
     // Read through packets, decode as either video or GPMF
-    DecodedPacket decodedPacket =
-        movDecoder.decodePacket(packet, streamCodecVec);
+    DecodedPacket decodedPacket = movDecoder.decodePacket(packet, streamCodecVec);
     //
-    if (display) {
-      if (decodedPacket.data.img.rows > 60 &&
-          decodedPacket.data.img.cols > 60) {
-        // Display
-        cv::imshow(decodedPacket.name, decodedPacket.data.img);
-        cv::waitKey(1);
-      } else {
-        LOG(DEBUG) << "No valid image found";
-      }
-    }
+    // if (display) {
+    //   if (decodedPacket.img.rows > 60 &&
+    //       decodedPacket.img.cols > 60) {
+    //     // Display
+    //     cv::imshow(decodedPacket.name, decodedPacket.img);
+    //     cv::waitKey(1);
+    //   } else {
+    //     LOG(DEBUG) << "No valid image found";
+    //   }
+    // }
+
     //
     if (decodedPacket.type == AVMEDIA_TYPE_VIDEO) {
 
-      sensor_msgs::ImagePtr ros_img =
-          ROSEncode::img2ROS(decodedPacket.data.img);
+      sensor_msgs::ImagePtr ros_img = ROSEncode::img2ROS(decodedPacket.img);
+
       if (packet.stream_index == 0)
         imgPubLeft.publish(ros_img);
       else if (packet.stream_index == 1)
         imgPubRight.publish(ros_img);
+
     } else if (decodedPacket.type == AVMEDIA_TYPE_GPMF) {
-      imaging_sonar_msgs::ImagingSonarMsg sonar_img =
-          ROSEncode::GPMF2ROS(decodedPacket.data.sonarData);
-      sonarPub.publish(sonar_img);
+
+      /// \TOOD.  Fix this.
+      // imaging_sonar_msgs::ImagingSonarMsg sonar_img = ROSEncode::GPMF2ROS(decodedPacket.data.sonarData);
+      // sonarPub.publish(sonar_img);
+
     } else {
       LOG(WARNING) << "Invalid data type decoded";
     }

@@ -62,7 +62,7 @@ if (FIPS_CONFIG)
       ${AVFORMAT_INCLUDE_DIR}
       #${AVUTIL_INCLUDE_DIR}
      )
-     
+
     fips_libs(
        ${OpenCV_LIBS}
        #${FFMPEG_LIBRARIES}
@@ -117,9 +117,9 @@ else()
   )
 
   include_directories(
-      ${catkin_INCLUDE_DIRS}
       include
       ros/include/
+      ${catkin_INCLUDE_DIRS}
     )
 
 

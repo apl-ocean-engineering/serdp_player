@@ -31,6 +31,8 @@
 #include "serdp_common/DrawSonar.h"
 #include "serdp_gpmf/GpmfSonarPlayer.h"
 
+#include "gpmf-parser/GPMF_parser.h"
+
 using namespace cv;
 
 namespace Decoder {
