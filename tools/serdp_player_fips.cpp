@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
         decodedPacket.img.cols > 60 ) {
 
       if( cvDisplay ) {
-        if( decodedPacket.type = AVMEDIA_TYPE_GPMF ) {
+        if( decodedPacket.type == AVMEDIA_TYPE_GPMF ) {
           cvDisplay->showVideo( decodedPacket.img, decodedPacket.name );
         } else if( decodedPacket.type == AVMEDIA_TYPE_VIDEO ) {
           cvDisplay->showVideo( decodedPacket.img, decodedPacket.name );
