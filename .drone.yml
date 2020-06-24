@@ -20,7 +20,7 @@ steps:
     - wget -O- https://gitlab.com/amarburg/ros_drone_ci/-/raw/master/bootstrap.sh | /bin/bash
   environment:
     ROS_PACKAGES_TO_INSTALL: cv-bridge image-transport opencv-apps
-    APT_PACKAGES_TO_INSTALL: libavcodec-dev
+    APT_PACKAGES_TO_INSTALL: libavcodec-dev libavdevice-dev
     WSTOOL_RECURSIVE: true
 
 - name: slack
