@@ -136,10 +136,10 @@ DecodedPacket MovDecoder::unpackGPMF(AVPacket packet) {
   // Unpack an AVPacket to the base GPMF type
   DecodedPacket decodedPacket;
   //std::shared_ptr<serdp_common::SonarData> sonarData;
-  GPMF_stream metadata_stream, *ms = &metadata_stream;
+  std::shared_ptr<GPMF_stream> ms( new GPMF_stream );
   int numBytes;
   AVBufferRef *buf = packet.buf;
-  int ret = GPMF_Init(ms, (uint32_t *)buf->data, buf->size);
+  int ret = GPMF_Init(ms.get(), (uint32_t *)buf->data, buf->size);
 
   // GPMF decoding
   std::string cam_img =
@@ -152,14 +152,13 @@ DecodedPacket MovDecoder::unpackGPMF(AVPacket packet) {
     return decodedPacket;
   }
 
-  if (GPMF_RawDataSize(ms) > 0) {
+  if (GPMF_RawDataSize(ms.get()) > 0) {
     // Find all the available Streams and the data carrying FourCC
-    int ret = GPMF_FindNext(ms, GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS);
+    int ret = GPMF_FindNext(ms.get(), GPMF_KEY_STREAM, GPMF_RECURSE_LEVELS);
     LOG(DEBUG) << "Unpacking GPMF data";
     while (GPMF_OK == ret) {
       // Setup GPMF player
-      ret = GPMF_SeekToSamples(ms);
-      //std::shared_ptr<liboculus::SonarPlayerBase> player(serdp_gpmf::createGPMFSonarPlayer());
+      ret = GPMF_SeekToSamples(ms.get());
 
       serdp_gpmf::GPMFSonarPlayer player(ms);
       // player->setStream(ms);
